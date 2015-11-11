@@ -1,0 +1,10 @@
+.gradle
+.settings
+
+bin/
+build/
+
+# Eclipse artifacts, including WTP generated manifests
+.classpath
+.project
+
