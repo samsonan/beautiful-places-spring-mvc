@@ -17,6 +17,22 @@
 	<div class="row">
 		<h2><c:out value="${place.title}"/></h2>
 		<p><c:out value="${place.description}"/></p>
+		<p><c:out value="${place.lat}"/></p>
+		<p><c:out value="${place.lon}"/></p>
+		<p>
+			<c:choose>
+				<c:when test="${not empty place.placeTypes}">
+					<c:forEach items="${place.placeTypes}" var="type">
+						${type.name}
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<tr>
+						<td colspan='4'>Nothing is found</td>
+					</tr>
+				</c:otherwise>
+			</c:choose>
+		</p>
 	</div>
 
 	<br>

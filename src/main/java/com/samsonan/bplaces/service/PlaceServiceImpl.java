@@ -42,6 +42,8 @@ public class PlaceServiceImpl implements PlaceService {
         if(entity!=null){
             entity.setTitle(place.getTitle());
             entity.setDescription(place.getDescription());
+            entity.setLat(place.getLat());
+            entity.setLon(place.getLon());
         }
 	}
 

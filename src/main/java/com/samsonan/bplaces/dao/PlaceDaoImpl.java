@@ -46,7 +46,7 @@ public class PlaceDaoImpl implements PlaceDao {
 	
 	@Override
 	public void deletePlaceById(int id) {
-        Query query = getSession().createSQLQuery("delete from places where id = :id");
+        Query query = getSession().createSQLQuery("delete from place where id = :id");
         query.setInteger("id", id);
         query.executeUpdate();		
 	}

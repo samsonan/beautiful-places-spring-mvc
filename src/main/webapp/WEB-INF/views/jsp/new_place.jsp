@@ -24,10 +24,23 @@
             </tr>
          
             <tr>
-                <td><label for="Description">Description: </label> </td>
+                <td><label for="description">Description: </label> </td>
                 <td><form:input path="description" id="description"/></td>
                 <td><form:errors path="description" cssClass="error"/></td>
             </tr>
+
+            <tr>
+                <td><label for="lat">Latitude: </label> </td>
+                <td><form:input path="lat" id="lat"/></td>
+                <td><form:errors path="lat" cssClass="error"/></td>
+            </tr>
+
+            <tr>
+                <td><label for="lon">Longitude: </label> </td>
+                <td><form:input path="lon" id="lon"/></td>
+                <td><form:errors path="lon" cssClass="error"/></td>
+            </tr>
+
      
             <tr>
                 <td colspan="3">
