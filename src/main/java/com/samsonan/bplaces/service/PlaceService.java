@@ -1,8 +1,9 @@
 package com.samsonan.bplaces.service;
 
-import java.util.List;
+import java.util.Set;
 
 import com.samsonan.bplaces.model.Place;
+import com.samsonan.bplaces.model.PlaceFilters;
 
 public interface PlaceService {
 
@@ -10,10 +11,12 @@ public interface PlaceService {
     
     void savePlace(Place place);
      
-    void updatePlace(Place place);
-
     void deletePlace(int id);
     
-    List<Place> getAllPlaces(); 
+    Set<Place> getAllPlaces(); 
+    Set<Place> getAllPlaces(PlaceFilters filters); 
+    
+	int getImgCountForPlace(int id);
+
      
 }

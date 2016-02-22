@@ -7,66 +7,99 @@ import javax.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.samsonan.bplaces.model.Place;
-import com.samsonan.bplaces.service.PlaceService;
+import com.samsonan.bplaces.model.User;
+import com.samsonan.bplaces.service.UserService;
 
+
+/**
+ * 
+ * http://www.mkyong.com/spring-mvc/spring-mvc-form-handling-example/
+ * 
+ * @author ShamanXXI
+ *
+ */
 @Controller
-public class AppController {
+public class UserController {
 
-	@Autowired
-	PlaceService service;
+	private final Logger logger = LoggerFactory.getLogger(UserController.class);	
 	
-	@RequestMapping(value = {"/","/places","/list"}, method = RequestMethod.GET)
-	public ModelAndView listPlaces() {
+	@Autowired
+	UserService userService;
+	
+	@RequestMapping(value = "/admin**", method = RequestMethod.GET)
+	public ModelAndView adminPage() {
 
-		List<Place> list = service.getAllPlaces();
-
-		//return back to index.jsp
-		ModelAndView model = new ModelAndView("index");
-		model.addObject("placeList", list);
+		ModelAndView model = new ModelAndView();
+		model.addObject("title", "Admin Dashboard");
+		model.setViewName("admin");
 
 		return model;
+
 	}
-	
-    @RequestMapping(value = { "/new" }, method = RequestMethod.GET)
-    public String newEmployee(ModelMap model) {
-        Place place = new Place();
-        model.addAttribute("place", place);
-        model.addAttribute("edit", false);
-        return "new_place";
-    }	
-    
-    @RequestMapping(value = { "/new" }, method = RequestMethod.POST)
-    public String saveEmployee(@Valid Place place, BindingResult result, ModelMap model) {
- 
-        if (result.hasErrors()) {
-            return "new_place";
+
+	@RequestMapping(value = {"/login"}, method = RequestMethod.GET)
+	public String login() {
+		return "login";
+	}
+
+	@RequestMapping(value = {"/users/add"}, method = RequestMethod.GET)
+	public String register(ModelMap model) {
+        User user = new User();
+        model.addAttribute("user", user);
+		return "register";
+	}	
+
+	@RequestMapping(value = {"/users/add"}, method = RequestMethod.POST)
+	public String register(@ModelAttribute("user") @Valid User userInfo, 
+			  BindingResult result) {
+		
+    	if (result.hasErrors()) {
+            return "/register";
         }
  
-        service.savePlace(place);
+    	try{
+    		userService.registerNewUser(userInfo);
+    	}catch(Exception ex){
+    		//TODO
+    	}
  
-        return "redirect:/list";
-    }    
-    
-    @RequestMapping(value = { "/view-place-{id}" }, method = RequestMethod.GET)
-    public String editEmployee(@PathVariable int id, ModelMap model) {
-        Place place = service.findById(id);
-        model.addAttribute("place", place);
-        model.addAttribute("edit", true);
-        return "place_info";
-    }    
-    
-    @RequestMapping(value = { "/delete-place-{id}" }, method = RequestMethod.GET)
-    public String deletePlace(@PathVariable int id) {
-        service.deletePlace(id);
-        return "redirect:/list";
-    }    
+		return "redirect:/map";
+	}	
+	
+	@RequestMapping(value = {"/users","/users/list"}, method = RequestMethod.GET)
+	public String listUsers(ModelMap model) {
 
+		List<User> list = userService.getAllUsers();
+
+		model.addAttribute("userList", list);
+
+		return "user_list";
+	}
+	
+	@RequestMapping(value = "/users/{id}/delete", method = RequestMethod.POST)
+	public String deleteUser(@PathVariable("id") int id, 
+		final RedirectAttributes redirectAttributes) {
+
+		logger.debug("deleteUser() : {}", id);
+
+		userService.deleteUser(id);
+		
+		redirectAttributes.addFlashAttribute("css", "success");
+		redirectAttributes.addFlashAttribute("msg", "User is deleted!");
+		
+		return "redirect:/users";
+
+	}	
+    
 }
 

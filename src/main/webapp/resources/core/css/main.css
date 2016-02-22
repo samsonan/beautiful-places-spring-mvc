@@ -1,6 +1,47 @@
+body {
+}
 
-#map-container {
-   height: 500px;
+hr {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.navbar-fixed-top {
+  margin-bottom: 19px;
+}
+
+    /* Set gray background color and 100% height */
+    .sidenav {
+      padding-top: 20px;
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+
+
+#map-canvas {
+   min-height: 100%;
    width: 100%;  
-   border: 2px solid #fff;
+   border: 2px solid #000;
+   top:0;
+   left:0;
+   position: absolute;
+}
+
+.checkbox {
+	margin-top:0px;
+}
+
+.panel-group {
+    margin-bottom: 10px;
+}
+
+h5 {
+	font-weight: bold;
 }

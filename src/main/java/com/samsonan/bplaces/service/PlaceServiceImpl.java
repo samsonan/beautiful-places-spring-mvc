@@ -1,6 +1,6 @@
 package com.samsonan.bplaces.service;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.samsonan.bplaces.dao.PlaceDao;
 import com.samsonan.bplaces.model.Place;
+import com.samsonan.bplaces.model.PlaceFilters;
 
 @Service("placeService")
 @Transactional
@@ -17,8 +18,12 @@ public class PlaceServiceImpl implements PlaceService {
 	@Autowired
     private PlaceDao dao;	
 
-	public List<Place> getAllPlaces(){
-		return dao.getAllPlaces();
+	public Set<Place> getAllPlaces(PlaceFilters filters){
+		return dao.findAll(filters);
+	}
+
+	public Set<Place> getAllPlaces(){
+		return dao.findAll(null);
 	}
 	
 	@Override
@@ -28,26 +33,16 @@ public class PlaceServiceImpl implements PlaceService {
 
 	@Override
 	public void savePlace(Place place) {
-		dao.savePlace(place);
+		dao.save(place);
 	}
 
 	@Override
 	public void deletePlace(int id) {
-		dao.deletePlaceById(id);
-	}
-	
-	@Override
-	public void updatePlace(Place place) {
-		Place entity = dao.findById(place.getId());
-        if(entity!=null){
-            entity.setTitle(place.getTitle());
-            entity.setDescription(place.getDescription());
-            entity.setLat(place.getLat());
-            entity.setLon(place.getLon());
-        }
+		dao.deleteById(id);
 	}
 
+	public int getImgCountForPlace(int id){
+		return dao.getImgCountForPlace(id);
+	}
 	
-
-
 }

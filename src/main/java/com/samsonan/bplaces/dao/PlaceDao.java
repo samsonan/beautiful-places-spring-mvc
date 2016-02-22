@@ -1,17 +1,20 @@
 package com.samsonan.bplaces.dao;
 
-import java.util.List;
+import java.util.Set;
 
 import com.samsonan.bplaces.model.Place;
+import com.samsonan.bplaces.model.PlaceFilters;
 
 public interface PlaceDao {
 
-	void savePlace(Place place);
+	void save(Place place);
 	
-	List<Place> getAllPlaces();
+	Set<Place> findAll(PlaceFilters filters);
 	
 	Place findById(int id);
 	 
-    void deletePlaceById(int id);
+    void deleteById(int id);
+    
+    int getImgCountForPlace(int id);
      
 }
