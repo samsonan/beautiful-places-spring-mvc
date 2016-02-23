@@ -1,7 +1,6 @@
 .gradle
 .settings
 .notes
-application.properties
 
 bin/
 build/
@@ -10,3 +9,4 @@ build/
 .classpath
 .project
 
+/src/main/resources/application.properties
