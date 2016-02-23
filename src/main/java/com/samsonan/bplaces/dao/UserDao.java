@@ -7,13 +7,14 @@ import com.samsonan.bplaces.model.User;
 public interface UserDao {
 
 	List<User> findAll();
+    User findByEmail(String email);
+	User findByName(String name);
     
 	User findById(int id);
      
-    void save(User user);
-     
-    List<User> findByEmail(String email);
+    void saveOrUpdate(User user);
      
     void deleteById(int id);	
-	
+
+    
 }

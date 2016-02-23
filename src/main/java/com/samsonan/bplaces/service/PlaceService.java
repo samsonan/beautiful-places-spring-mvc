@@ -8,13 +8,13 @@ import com.samsonan.bplaces.model.PlaceFilters;
 public interface PlaceService {
 
 	Place findById(int id);
-    
+
+    Set<Place> findAll(); 
+    Set<Place> findAll(PlaceFilters filters); 
+	
     void savePlace(Place place);
      
-    void deletePlace(int id);
-    
-    Set<Place> getAllPlaces(); 
-    Set<Place> getAllPlaces(PlaceFilters filters); 
+    void deleteById(int id);
     
 	int getImgCountForPlace(int id);
 

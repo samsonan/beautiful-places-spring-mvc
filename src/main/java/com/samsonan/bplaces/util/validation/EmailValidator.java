@@ -1,4 +1,4 @@
-package com.samsonan.bplaces.util;
+package com.samsonan.bplaces.util.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

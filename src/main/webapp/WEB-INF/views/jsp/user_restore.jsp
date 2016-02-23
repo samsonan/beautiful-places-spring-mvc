@@ -27,27 +27,28 @@
 
 
 	<div class="container">
-		<div id="loginbox" style="margin-top: 70px;"
+		<div id="restorebox" style="margin-top: 70px;"
 			class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<div class="panel-title">Sign In</div>
+					<div class="panel-title">Restore Password</div>
 				</div>
 
 				<div style="padding-top: 20px" class="panel-body">
 
-					<div style="display: none" id="login-alert"
+					<div style="display: none" id="restore-alert"
 						class="alert alert-danger col-sm-12"></div>
 
-					<c:url var="loginUrl" value="/login" />
-					<form id="loginform" action="${loginUrl}" method="post" class="form-horizontal" role="form">
+					<h3> Enter your name OR email </h3>
+					<c:url var="restoreUrl" value="/restore" />
+					<form id="restoreform" action="${restoreUrl}" method="post" class="form-horizontal">
 
 						<c:if test="${param.error != null}">
                         	<div class="alert alert-danger">
-                            	<p>Invalid username and password.</p>
+                            	<p>Invalid username and/or password.</p>
                             </div>
                         </c:if>
-                        <c:if test="${param.logout != null}">
+                        <c:if test="${param.success != null}">
                         	<div class="alert alert-success">
                             	<p>You have been logged out successfully.</p>
                             </div>
@@ -55,54 +56,29 @@
 
 						<div style="margin-bottom: 25px" class="input-group">
 							<span class="input-group-addon"><i
-								class="glyphicon glyphicon-user"></i></span> <input id="login-username"
+								class="glyphicon glyphicon-user"></i></span> <input id="username"
 								type="text" class="form-control" name="username" value=""
-								placeholder="username or email">
+								placeholder="name">
 						</div>
 
 						<div style="margin-bottom: 10px" class="input-group">
 							<span class="input-group-addon"><i
-								class="glyphicon glyphicon-lock"></i></span> <input id="login-password"
-								type="password" class="form-control" name="password"
-								placeholder="password">
+								class="glyphicon glyphicon-envelope"></i></span> <input id="email"
+								type="text" class="form-control" name="email"
+								placeholder="email">
 						</div>
 
-							<div class="checkbox">
-								<label> <input id="login-remember" type="checkbox"
-									name="remember-me" value="1"> Remember me
-								</label>
-							</div>
-
+						<input type="hidden" name="${_csrf.parameterName}"   value="${_csrf.token}" />		
 
 						<div style="margin-top: 10px" class="form-group">
 							<!-- Button -->
 
 							<div class="col-sm-12 controls">
-								<input type="submit" class="btn btn-success"> </input> <a
-									id="btn-fblogin" href="#" class="btn btn-primary">Login
-									with Facebook</a>
-
+								<input type="submit" class="btn btn-success" value="Send Password"> </input> 
 							</div>
 						</div>
 
-						<input type="hidden" name="${_csrf.parameterName}"   value="${_csrf.token}" />
-                                 
-						<div class="form-group">
-							<div class="col-md-12 control">
-								<div
-									style="border-top: 1px solid #888; padding-top: 15px; font-size: 85%">
-									Don't have an account! <a href="<c:url value='/register' />">Sign Up Here </a>
-								</div>
-								<div
-									style="padding-top: 15px; font-size: 85%">
-									Forgot you password?! <a href="<c:url value='/restore' />">Restore It!</a>
-								</div>
-							</div>
-						</div>
 					</form>
-
-
-
 				</div>
 			</div>
 		</div>

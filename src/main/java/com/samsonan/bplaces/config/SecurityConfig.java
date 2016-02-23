@@ -6,39 +6,35 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+	@Autowired
+	UserDetailsService userService;
 	
-	/**
-	 * TODO: use UserDetailsService to authenticate (p.259)
-	 * http://www.mkyong.com/spring-security/spring-security-remember-me-example/
-	 * 
-	 * @param auth
-	 * @throws Exception
-	 */
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication()
-                   .withUser("samsonan").password("111").roles("USER");
-		auth.inMemoryAuthentication()
-			.withUser("admin").password("admin").roles("USER","ADMIN");
+		//TODO: encrypted passwords
+		auth.userDetailsService(userService);		
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
 	    http
-//	    .formLogin().and()
 	    .authorizeRequests()
 	    .antMatchers("/", "/map").permitAll()
-		.antMatchers("/places/add*").access("hasRole('USER')")
-		.antMatchers("/places/edit-*").access("hasRole('USER')")
-		.antMatchers("/places/delete-*").access("hasRole('USER')")
+		.antMatchers("/restore").permitAll()
+		.antMatchers("/places/list_admin").access("hasRole('ADMIN')")
+		.antMatchers("/places/add*").access("hasAnyRole('USER','ADMIN')")
+		.antMatchers("/places/edit-*").access("hasAnyRole('USER','ADMIN')")
+		.antMatchers("/places/delete-*").access("hasAnyRole('USER','ADMIN')")
 		.antMatchers("/places/**").permitAll()
-		.antMatchers("/admin/**").access("hasRole('ADMIN')")
+		.antMatchers("/users/**").access("hasRole('ADMIN')")
+		.antMatchers("/users/me").access("hasAnyRole('USER','ADMIN')")
 		.and()
 		    .formLogin().loginPage("/login")
 		    .failureUrl("/login?error") //default
@@ -48,6 +44,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.and()
 		    .logout().logoutSuccessUrl("/login?logout") //default
 		.and()
-		    .csrf();//???? 		
+		    .csrf(); 		
 	}
 }

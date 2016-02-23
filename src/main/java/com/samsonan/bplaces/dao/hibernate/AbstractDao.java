@@ -1,4 +1,4 @@
-package com.samsonan.bplaces.dao;
+package com.samsonan.bplaces.dao.hibernate;
 
 import java.io.Serializable;
 

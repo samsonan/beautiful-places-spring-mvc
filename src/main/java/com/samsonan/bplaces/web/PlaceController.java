@@ -27,7 +27,6 @@ import com.samsonan.bplaces.model.Country;
 import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.model.PlaceFilters;
 import com.samsonan.bplaces.model.PlaceLink;
-import com.samsonan.bplaces.model.User;
 import com.samsonan.bplaces.service.PlaceService;
 
 @Controller
@@ -39,7 +38,7 @@ public class PlaceController {
 	PlaceService placeService;
 
 	@Autowired
-	LocationDao locationDao; //TODO: better use service
+	LocationDao locationDao; //TODO: use service?
 
 	@RequestMapping(value = {"/", "/map"}, method = RequestMethod.GET)
 	public String mapPlaces(Model model) {
@@ -59,7 +58,7 @@ public class PlaceController {
 	public String mapApplyFilter(@ModelAttribute("filters") @Valid PlaceFilters filters, 
 			Model model) {
 		
-		Set<Place> set = placeService.getAllPlaces(filters);
+		Set<Place> set = placeService.findAll(filters);
 		model.addAttribute("filters", filters);
 		model.addAttribute("placeList", set);
  
@@ -74,19 +73,18 @@ public class PlaceController {
 	}		
 
 	private String resetFilters(Model model) {
-		Set<Place> set = placeService.getAllPlaces();
+		Set<Place> set = placeService.findAll();
 		model.addAttribute("filters", new PlaceFilters());
 		model.addAttribute("placeList", set);
 		
 		return "map";
 	}
 	
-	//TODO: remove
-	@RequestMapping(value = {"/places/list_obsolete"}, method = RequestMethod.GET)
+	@RequestMapping(value = {"/places/list_admin"}, method = RequestMethod.GET)
 	public ModelAndView listPlaces2() {
 
-		Set<Place> set = placeService.getAllPlaces();
-		ModelAndView model = new ModelAndView("list");
+		Set<Place> set = placeService.findAll();
+		ModelAndView model = new ModelAndView("place_list_admin");
 		model.addObject("placeList", set);
 		return model;
 	}
@@ -107,7 +105,6 @@ public class PlaceController {
         return "place_edit";
     }	
 
-    //TODO: user control access
     @RequestMapping(value = { "/places/edit-place-{id}" }, method = RequestMethod.GET)
     public String editPlace(@PathVariable int id, ModelMap model) {
     	
@@ -125,7 +122,7 @@ public class PlaceController {
         
     @RequestMapping(value = { "/places/delete-place-{id}" }, method = RequestMethod.GET)
     public String deletePlace(@PathVariable int id) {
-        placeService.deletePlace(id);
+        placeService.deleteById(id);
         return "redirect:list";
     }    
 

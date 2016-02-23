@@ -10,24 +10,39 @@ import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
-import com.samsonan.bplaces.dao.AbstractDao;
 import com.samsonan.bplaces.dao.PlaceDao;
+import com.samsonan.bplaces.dao.UserDao;
 import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.model.PlaceFilters;
+import com.samsonan.bplaces.model.User;
 
 
 @Repository("placeDao")
 public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements PlaceDao {
 
-	public void save(Place place) {
+	@Autowired
+	UserDao userDao;
+	
+	public void saveOrUpdate(Place place) {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String name = auth.getName(); //get logged in username
+	    User user = userDao.findByName(name);
+		
 		if (findById(place.getId()) != null) {
 			place.setUpdated(new Date());
+			place.setUpdatedBy(user);
 			merge(place);
 		} else {
 			place.setUpdated(new Date());
 //			place.setCreated(new Date()); done on DB level
+			place.setUpdatedBy(user);
+			place.setCreatedBy(user);
 			persist(place);
 		}
 
@@ -72,8 +87,7 @@ public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements Pl
 	
 	@Override
 	public void deleteById(int id) {
-		Place place =  getByKey(id);
-        delete(place);
+        delete(getByKey(id));
 	}
 	
 	@Override

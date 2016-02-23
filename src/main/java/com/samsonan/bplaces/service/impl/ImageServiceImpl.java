@@ -1,4 +1,4 @@
-package com.samsonan.bplaces.service;
+package com.samsonan.bplaces.service.impl;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.samsonan.bplaces.dao.ImageDao;
 import com.samsonan.bplaces.model.Image;
+import com.samsonan.bplaces.service.ImageService;
 
 @Service("imageService")
 @Transactional
@@ -29,7 +30,7 @@ public class ImageServiceImpl implements ImageService {
     }
      
     public void saveImage(Image image){
-        dao.save(image);
+        dao.saveOrUpdate(image);
     }
  
     public void deleteById(int id){

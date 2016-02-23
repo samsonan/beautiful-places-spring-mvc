@@ -1,35 +1,23 @@
 package com.samsonan.bplaces.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.samsonan.bplaces.util.ValidEmail;
-
-//TODO: user role
+//TODO: int to Integers
 @Entity
-@Table(name="user")
+@Table(name="bplace_user")
 public class User { 
+	
+	public final static String [] ROLE_LIST = {"ROLE_USER", "ROLE_ADMIN"};
 	
 	@Id
 	@Column(name="id")
@@ -40,7 +28,7 @@ public class User {
 	@Column(name="name")
     private String name;
 
-    @ValidEmail
+    //@ValidEmail
     @NotEmpty
 	@Column(name="email")
     private String email;
@@ -55,6 +43,12 @@ public class User {
 	@Column(name="password")
     private String password;
 
+    @Transient
+    private String confirmPassword;
+    
+	@Column(name="role")
+    private String role;
+   
 	public int getId() {
 		return id;
 	}
@@ -101,9 +95,57 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
-	} 
+	}
 
+	public String getRole() {
+		return role;
+	}
 
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public boolean isNew() {
+		return (id == 0);
+	}
+
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
+	}
 	
+	@Override
+    public int hashCode() {
+		return new HashCodeBuilder(17, 37).
+			       append(name).
+			       append(email).
+			       toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		User other = (User) obj;
+		return new EqualsBuilder().appendSuper(super.equals(obj)).append(name, other.name)
+				.append(email, other.email).isEquals();
+	}
+ 
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", name="+name+", ROLE=" + role + "]";
+    }
+    
+    
 	
 } 

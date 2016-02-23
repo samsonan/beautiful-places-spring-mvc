@@ -7,11 +7,11 @@ import com.samsonan.bplaces.model.PlaceFilters;
 
 public interface PlaceDao {
 
-	void save(Place place);
-	
 	Set<Place> findAll(PlaceFilters filters);
-	
+
 	Place findById(int id);
+
+	void saveOrUpdate(Place place);
 	 
     void deleteById(int id);
     

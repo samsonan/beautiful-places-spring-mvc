@@ -1,5 +1,10 @@
 package com.samsonan.bplaces.model;
 
+/**
+ * Class to transfer filter values to/from form 
+ * @author ShamanXXI
+ *
+ */
 public class PlaceFilters {
 
 	public final static String [] NATURE_TYPES = {"BEACH", "LAKE", "MOUNT", "RIVER", "VOLC"};

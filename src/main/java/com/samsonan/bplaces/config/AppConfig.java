@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Spring annotation configuration to scan the service classes.
- *
- * TODO: tutorial: //http://websystique.com/springmvc/spring-4-mvc-and-hibernate4-integration-example-using-annotations/
  */
 
 @Configuration

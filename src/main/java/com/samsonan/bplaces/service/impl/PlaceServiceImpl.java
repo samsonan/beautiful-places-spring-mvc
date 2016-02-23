@@ -1,4 +1,4 @@
-package com.samsonan.bplaces.service;
+package com.samsonan.bplaces.service.impl;
 
 import java.util.Set;
 
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.samsonan.bplaces.dao.PlaceDao;
 import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.model.PlaceFilters;
+import com.samsonan.bplaces.service.PlaceService;
 
 @Service("placeService")
 @Transactional
@@ -18,11 +19,11 @@ public class PlaceServiceImpl implements PlaceService {
 	@Autowired
     private PlaceDao dao;	
 
-	public Set<Place> getAllPlaces(PlaceFilters filters){
+	public Set<Place> findAll(PlaceFilters filters){
 		return dao.findAll(filters);
 	}
 
-	public Set<Place> getAllPlaces(){
+	public Set<Place> findAll(){
 		return dao.findAll(null);
 	}
 	
@@ -33,11 +34,11 @@ public class PlaceServiceImpl implements PlaceService {
 
 	@Override
 	public void savePlace(Place place) {
-		dao.save(place);
+		dao.saveOrUpdate(place);
 	}
 
 	@Override
-	public void deletePlace(int id) {
+	public void deleteById(int id) {
 		dao.deleteById(id);
 	}
 

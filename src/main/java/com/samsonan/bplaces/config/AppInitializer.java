@@ -2,7 +2,6 @@ package com.samsonan.bplaces.config;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRegistration.Dynamic;
 
 /**
@@ -46,8 +45,7 @@ public class AppInitializer extends
  
     private static final String LOCATION = "C:/temp/"; // Temporary location where files will be stored
  
-    private static final long MAX_FILE_SIZE = 5242880; // 5MB : Max file size.
-                                                        // Beyond that size spring will throw exception.
+    private static final long MAX_FILE_SIZE = 5242880; // 5MB : Max file size. Beyond that size spring will throw exception.
     private static final long MAX_REQUEST_SIZE = 20971520; // 20MB : Total request size containing Multi part.
      
     private static final int FILE_SIZE_THRESHOLD = 0; // Size threshold after which files will be written to disk

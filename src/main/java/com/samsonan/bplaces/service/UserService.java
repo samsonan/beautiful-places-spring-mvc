@@ -3,20 +3,19 @@ package com.samsonan.bplaces.service;
 import java.util.List;
 
 import com.samsonan.bplaces.model.User;
-import com.samsonan.bplaces.util.EmailExistsException;
 
 public interface UserService {
 
-	User registerNewUser(User user) throws EmailExistsException;
+	User registerNewUser(User user);
 
-	User findById(int id);
+    List<User> findAll(); 
     
+	User findById(int id);
+	User findByName(String name);
+	
     void saveUser(User user);
      
-    void updateUser(User user);
-
-    void deleteUser(int id);
+    void deleteById(int id);
     
-    List<User> getAllUsers(); 
 	
 }

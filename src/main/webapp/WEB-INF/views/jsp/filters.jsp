@@ -55,8 +55,8 @@
 			<div class="panel-heading">
 				<h4 class="panel-title">
 					<form:checkbox path="nature" class="checkNature" id="checkNatureAll"
-						value="" /> <a data-toggle="collapse" href="#collapse_nat">Natural
-						Places <i class="fa fa-chevron-down"></i></a>
+						value="" /> <a data-toggle="collapse" href="#collapse_nat">
+						Natural Places <i class="fa fa-chevron-down pull-right"></i></a>
 				</h4>
 			</div>
 			<div id="collapse_nat" class="panel-collapse collapse">
@@ -91,8 +91,8 @@
 			<div class="panel-heading">
 				<h4 class="panel-title">
 					<form:checkbox path="culture" class="checkCulture" id="checkCultureAll"
-						value="" /> <a data-toggle="collapse" href="#collapse_cult">Cultural
-						Places <i class="fa fa-chevron-down"></i></a>
+						value="" /> <a data-toggle="collapse" href="#collapse_cult">
+						Cultural Places <i class="fa fa-chevron-down pull-right"></i></a>
 				</h4>
 			</div>
 			<div id="collapse_cult" class="panel-collapse collapse">

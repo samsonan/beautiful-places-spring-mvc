@@ -1,11 +1,8 @@
 package com.samsonan.bplaces.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
-public class FileBucket {
+public class ImageUploadForm {
  
 	private MultipartFile file;
 	private String imageUrl;
@@ -19,8 +16,6 @@ public class FileBucket {
     public void setFile(MultipartFile file) {
         this.file = file;
     }
-
-    
     
     public String getImageUrl() {
 		return imageUrl;

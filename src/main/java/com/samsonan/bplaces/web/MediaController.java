@@ -3,19 +3,13 @@ package com.samsonan.bplaces.web;
 
 import java.awt.image.BufferedImage;
 
-//https://github.com/blueimp/jQuery-File-Upload/wiki
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.io.IOUtils;
@@ -25,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -34,16 +27,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
  
-import com.samsonan.bplaces.model.FileBucket;
+import com.samsonan.bplaces.model.ImageUploadForm;
 import com.samsonan.bplaces.model.Image;
 import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.service.ImageService;
 import com.samsonan.bplaces.service.PlaceService;
-import com.samsonan.bplaces.util.FileValidator;
-import org.springframework.mock.web.MockMultipartFile;
- 
-//http://websystique.com/springmvc/spring-mvc-4-fileupload-download-hibernate-example/
+import com.samsonan.bplaces.util.validation.FileValidator;
 
+import org.springframework.mock.web.MockMultipartFile;
 
 /**
  * Plug-in used for preview: http://plugins.krajee.com/file-input#features
@@ -68,17 +59,17 @@ public class MediaController {
  
     @InitBinder("fileBucket")
     protected void initBinderFileBucket(WebDataBinder binder) {
+    	//TODO:
         //binder.setValidator(fileValidator);
     }
- 
-    
+     
     @RequestMapping(value = { "/places/add-image-{placeId}" }, method = RequestMethod.GET)
     public String addImages(ModelMap model, @PathVariable int placeId) {
 
     	Place place = placeService.findById(placeId);
         model.addAttribute("place", place);
         
-    	FileBucket fileModel = new FileBucket();
+    	ImageUploadForm fileModel = new ImageUploadForm();
         model.addAttribute("fileBucket", fileModel);
  
         List<Image> images =  imageService.findAllByPlaceId(placeId);
@@ -95,10 +86,10 @@ public class MediaController {
 
     	Image image = imageService.findById(imageId);
 
-    	FileBucket fileModel = new FileBucket();
+    	ImageUploadForm fileModel = new ImageUploadForm();
     	fileModel.setDescription(image.getDescription());
 
-    	if (image.getContentType().equals("URL")) { //TODO: constant
+    	if (image.getContentType().equals(Image.CONTENT_TYPE_URL)) { 
         	fileModel.setImageUrl(image.getFilename());
     	} else {
         	File file = new File(UPLOAD_LOCATION+image.getFilename());
@@ -124,11 +115,11 @@ public class MediaController {
     }  
     
     @RequestMapping(value = { "/places/add-image-{placeId}" }, method = RequestMethod.POST)
-    public String uploadImage(@Valid FileBucket fileBucket, BindingResult result, ModelMap model, @PathVariable int placeId) throws IOException{
+    public String uploadImage(@Valid ImageUploadForm fileBucket, BindingResult result, ModelMap model, @PathVariable int placeId) throws Exception{
          
         if (result.hasErrors()) {
-            System.out.println("validation errors");
-            Place place = placeService.findById(placeId);
+
+        	Place place = placeService.findById(placeId);
             model.addAttribute("place", place);
  
             List<Image> image = imageService.findAllByPlaceId(placeId);
@@ -137,8 +128,6 @@ public class MediaController {
             return "manage_images";
         } else {
              
-            System.out.println("Fetching file");
-             
             Place place = placeService.findById(placeId);
             model.addAttribute("place", place);
  
@@ -146,14 +135,14 @@ public class MediaController {
             	saveImageFromFile(fileBucket, place);
             else if (!fileBucket.getImageUrl().isEmpty())
             	saveImageFromUrl(fileBucket, place); //TODO: check if available
-            else //TODO: exception
-            	throw new RuntimeException();
+            else //TODO: correct exception
+            	throw new Exception();
  
             return "redirect:/places/add-image-"+placeId;
         }
     }    
 
-    private void saveImageFromUrl(FileBucket fileBucket, Place place) throws IOException{
+    private void saveImageFromUrl(ImageUploadForm fileBucket, Place place) throws IOException{
     	
         Image image = new Image();
         image.setDescription(fileBucket.getDescription());
@@ -164,13 +153,12 @@ public class MediaController {
     	
     }
     
-    private void saveImageFromFile(FileBucket fileBucket, Place place) throws IOException{
+    private void saveImageFromFile(ImageUploadForm fileBucket, Place place) throws IOException{
         
         Image image = new Image();
          
         MultipartFile multipartFile = fileBucket.getFile();
          
-//        image.setName(multipartFile.getOriginalFilename());
         image.setDescription(fileBucket.getDescription());
         image.setContentType(multipartFile.getContentType());
         image.setContent(multipartFile.getBytes());//saving content to DB - not used now
@@ -192,8 +180,6 @@ public class MediaController {
             ImageIO.write(thumbnail, "png", thumbnailFile);
             
             image.setThumbnailFileName(thumbnailFileName);
-//            image.setSize(mpf.getSize());
-//            image.setThumbnailSize(thumbnailFile.length());
             
         } catch(IOException e) {
             log.error("Could not upload file "+multipartFile.getOriginalFilename(), e);

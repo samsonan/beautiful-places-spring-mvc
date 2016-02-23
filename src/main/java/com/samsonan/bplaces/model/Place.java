@@ -16,11 +16,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
+//TODO: int to Integers
 @Entity
 @Table(name="place")
 public class Place { 
@@ -64,6 +68,15 @@ public class Place {
 
 	@Column(name="country")
     private String country; //TODO: location/code 
+
+	@ManyToOne
+	@JoinColumn(name="created_by")
+    private User createdBy; 
+
+	@ManyToOne
+	@JoinColumn(name="updated_by")
+    private User updatedBy; 
+	
 	
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name="PLACE_TYPE", joinColumns=@JoinColumn(name="PLACE_ID"))
@@ -117,7 +130,7 @@ public class Place {
 	public Set<String> getPlaceTypes() {
 		return this.placeTypes;
 	}	
-
+	
 	public void setPlaceTypes(Set<String> placeTypes) {
 		this.placeTypes = placeTypes;
 	}
@@ -189,5 +202,55 @@ public class Place {
 	public String getLocationPath(){
 		return "China";
 	}
+
+	public User getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public User getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(User updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	@Override
+    public int hashCode() {
+		return new HashCodeBuilder(19, 39).
+			       append(title).
+			       append(lat).
+			       append(lon).
+			       toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		Place other = (Place) obj;
+		return new EqualsBuilder().appendSuper(super.equals(obj)).append(title, other.title)
+				.append(lat, other.lat)
+				.append(lon, other.lon)
+				.isEquals();
+	}
+ 
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", title="+title+", description=" + description + ""
+        		+ ", lat=" + lat + ", lon=" + lon + ", status=" + status + "]";
+    }
+    	
 	
 } 

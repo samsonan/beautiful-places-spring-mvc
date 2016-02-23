@@ -1,4 +1,4 @@
-package com.samsonan.bplaces.util;
+package com.samsonan.bplaces.util.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -9,10 +9,6 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-/**
- * tutorial: http://www.javacodegeeks.com/2013/07/spring-mvc-custom-validation-annotations.html
- *
- */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE}) 
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = EmailValidator.class)

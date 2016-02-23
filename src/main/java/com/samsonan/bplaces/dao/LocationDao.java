@@ -5,8 +5,8 @@ import com.samsonan.bplaces.model.Country;
 
 public interface LocationDao {
 
-	public Country findCountryByCode(String countryCode) throws Exception;
+	Country findCountryByCode(String countryCode) throws Exception;
 
-	public List<Country> findAllCountries();
+	List<Country> findAllCountries();
 
 }

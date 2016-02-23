@@ -1,6 +1,7 @@
 .gradle
 .settings
 .notes
+application.properties
 
 bin/
 build/

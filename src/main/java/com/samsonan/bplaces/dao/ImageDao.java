@@ -7,13 +7,12 @@ import com.samsonan.bplaces.model.Image;
 public interface ImageDao {
 
 	List<Image> findAll();
+    List<Image> findAllByPlaceId(int placeId);
     
 	Image findById(int id);
      
-    void save(Image image);
-     
-    List<Image> findAllByPlaceId(int placeId);
+    void saveOrUpdate(Image image);
      
     void deleteById(int id);	
-	
+
 }

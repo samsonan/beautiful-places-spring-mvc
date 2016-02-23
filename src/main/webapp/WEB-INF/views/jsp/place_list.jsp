@@ -1,6 +1,9 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec"	uri="http://www.springframework.org/security/tags" %>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,52 +80,45 @@ footer {
 					<small>RECENT PLACES</small>
 				</h4>
 				<hr>
-				<h2>Mount Bromo</h2>
-				<h5>
-					<span class="glyphicon glyphicon-globe"></span> Asia / Indonesia /
-					Java
-				</h5>
-				<h5>
-					<span class="label label-default">volcano</span>
-				</h5>
-				<br> <img src="bwwh.jpg" class="img-responsive"
-					style="max-width: 70%" /> <br />
-				<p>Food is my passion. Lorem ipsum dolor sit amet, consectetur
-					adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-					dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-					exercitation ullamco laboris nisi ut aliquip ex ea commodo
-					consequat. Excepteur sint occaecat cupidatat non proident, sunt in
-					culpa qui officia deserunt mollit anim id est laborum consectetur
-					adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-					dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-					exercitation ullamco laboris nisi ut aliquip ex ea commodo
-					consequat.</p>
-				<br>
-				<br>
+				
+				<c:forEach var="place" items="${placeList}">
+					<spring:url value="/places/view-place-${place.id}" var="viewUrl" />
+					<spring:url value="/places/edit-place-${place.id}" var="updateUrl" />
+					<h2><a href="${viewUrl}">${place.title}</a>
+					
+						<sec:authorize access="isAuthenticated()">
+							<button class="btn btn-primary"
+								onclick="location.href='${updateUrl}'">Update</button>
+						</sec:authorize>
+					</h2>
+					<h5>
+						<span class="glyphicon glyphicon-globe"></span> ${place.country} / ${place.locationPath}
+					</h5>
+					<h5>
+						<c:if test="${place.unesco}" >
+							<span class="label label-danger">UNESCO</span>
+						</c:if>
+						<c:forEach var="placeType" items="${place.placeTypes}">
+							<span class="label label-default">${placeType}</span>
+						</c:forEach>
+					</h5>
+					<br>
 
-				<hr>
-				<h2>Borobudur</h2>
-				<h5>
-					<span class="glyphicon glyphicon-globe"></span> Asia / Indonesia /
-					Java
-				</h5>
-				<h5>
-					<span class="label label-danger">UNESCO</span> <span
-						class="label label-default">temple</span>
-				</h5>
-				<br> <img src="bwwh.jpg" class="img-responsive"
-					style="max-width: 70%" /> <br />
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-					enim ad minim veniam, quis nostrud exercitation ullamco laboris
-					nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat
-					cupidatat non proident, sunt in culpa qui officia deserunt mollit
-					anim id est laborum consectetur adipiscing elit, sed do eiusmod
-					tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-					minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-					aliquip ex ea commodo consequat.</p>
-				<hr>
+						<c:forEach items="${place.placeImages}" var="img" varStatus="idx">
 
+							<c:if test="${idx.index==0}">
+								<img src="<spring:url value="${img.imageSrc}"/>" alt="${img.title}" class="img-responsive" style="max-width: 70%" >
+							</c:if>
+						</c:forEach>
+						
+					<br />
+					<p>${place.description}</p>
+					<br>
+					<br>
+					<hr>
+				
+				</c:forEach>
+				
 			</div>
 		</div>
 	</div>

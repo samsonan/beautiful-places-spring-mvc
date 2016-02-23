@@ -11,21 +11,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Type;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
 @Table(name = "image")
 public class Image implements Serializable {
     
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = -6765765909373091343L;
 
+	public final static String CONTENT_TYPE_URL = "URL";
+	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -51,7 +50,7 @@ public class Image implements Serializable {
     @Column(name = "thumb_file_name")
     private String thumbnailFileName;
     
-    //http://stackoverflow.com/questions/3677380/proper-hibernate-annotation-for-byte
+    //Notes: http://stackoverflow.com/questions/3677380/proper-hibernate-annotation-for-byte
     @Basic(fetch = FetchType.LAZY)
     @Column(name="content", nullable=false)
     private byte[] content;
@@ -143,41 +142,43 @@ public class Image implements Serializable {
 		this.thumbnailFileName = thumbnailFileName;
 	}
 
+	public String getImageSrc(){
+		if (getContentType().equals(CONTENT_TYPE_URL))
+			return getFilename();
+		else 
+			return "/images/"+getFilename();
+	}
+	
 	@Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((filename == null) ? 0 : filename.hashCode());
-        return result;
-    }
- 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!(obj instanceof Image))
-            return false;
-        Image other = (Image) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (filename == null) {
-            if (other.filename != null)
-                return false;
-        } else if (!filename.equals(other.filename))
-            return false;
-        return true;
-    }
+		return new HashCodeBuilder(15, 35).
+			       append(title).
+			       append(filename).
+			       append(contentType).
+			       toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		Image other = (Image) obj;
+		return new EqualsBuilder().appendSuper(super.equals(obj)).append(title, other.title)
+				.append(filename, other.filename)
+				.append(contentType, other.contentType)
+				.isEquals();
+	}
  
     @Override
     public String toString() {
-        return "UserDocument [id=" + id + ", filename="+filename+", title=" + title + ", description="
-                + description + ", type=" + contentType + "]";
+        return "Image [id=" + id + ", title="+title+", contentType=" + contentType + ", filename=" + filename + "]";
     }
  
     

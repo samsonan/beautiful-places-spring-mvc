@@ -69,9 +69,10 @@
 
 
 	<script>
-		markerLatLon = [
+		markerInfo = [
 				<c:forEach items="${placeList}" var="s">[
-						<c:out value="${s.lat}"/>, <c:out value="${s.lon}"/>],
+						<c:out value="${s.lat}"/>, <c:out value="${s.lon}"/>, '<c:out value="${s.title}"/>',<c:out value="${s.id}"/>
+						,'<c:out value="${s.placeTypes}"/>'],
 				</c:forEach> ];
 
 		function initialize() {
@@ -95,25 +96,36 @@
 
 			var marker, i;
 
-			for (i = 0; i < markerLatLon.length; i++) {
+			for (i = 0; i < markerInfo.length; i++) {
 				marker = new google.maps.Marker({
-					position : new google.maps.LatLng(markerLatLon[i][0],
-							markerLatLon[i][1]),
-					map : map
+					position : new google.maps.LatLng(markerInfo[i][0],
+							markerInfo[i][1]),
+					map : map,
+					title: markerInfo[i][2],
+					id: markerInfo[i][3]
 				});
 
-				/*
-				google.maps.event.addListener(marker, 'click', (function(marker, i) {
-				  return function() {
-				    infowindow.setContent(locations[i][0]);
-				    infowindow.open(map, marker);
-				  }
-				})(marker, i)); 
-				 */
+				marker.addListener('click', function() {
+					window.location.href = '<spring:url value="/places/view-place-"/>'.concat(this.id);
+				  });				
+
+				// add an event listener for this marker
+				bindInfoWindow(marker, map, infowindow, "<b>" + markerInfo[i][2] + "</b><br/><p>"+markerInfo[i][4]+"</p>"); 				
+				
+				marker.addListener('mouseout', function() {
+				    infowindow.close();
+				});				
 			}
 
 		}
 
+		function bindInfoWindow(marker, map, infowindow, html) { 
+			google.maps.event.addListener(marker, 'mouseover', function() { 
+				infowindow.setContent(html); 
+				infowindow.open(map, marker); 
+			}); 
+		} 		
+		
 		google.maps.event.addDomListener(window, 'load', initialize);
 	</script>
 

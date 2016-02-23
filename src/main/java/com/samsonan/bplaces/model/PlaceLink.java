@@ -10,6 +10,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+//TODO: int id to integer
 @Entity
 @Table(name="place_link")
 public class PlaceLink {
@@ -68,6 +72,36 @@ public class PlaceLink {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+
+	@Override
+    public int hashCode() {
+		return new HashCodeBuilder(19, 39).
+			       append(siteName).
+			       append(url).
+			       toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		PlaceLink other = (PlaceLink) obj;
+		return new EqualsBuilder().appendSuper(super.equals(obj)).append(siteName, other.siteName)
+				.append(url, other.url)
+				.isEquals();
+	}
+ 
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", siteName="+siteName+", url=" + url + "]";
+    }
 	
 	
 	
