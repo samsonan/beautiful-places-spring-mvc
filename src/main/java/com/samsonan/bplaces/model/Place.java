@@ -19,29 +19,33 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.URL;
 
-//TODO: int to Integers
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="place")
 public class Place { 
 	
 	public final static int STATUS_PENDING = 0; 
 	public final static int STATUS_READY = 1; 
+	public final static int STATUS_PUBLISHED = 2; 
 	
 	@Id
 	@Column(name="id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;  
+    private Integer id;  
 	
-	@NotEmpty(message = "{NotEmpty.place.title}")
+	@NotEmpty
 	@Column(name="title")
     private String title;
 
-	@NotEmpty(message = "{NotEmpty.place.description}")
+	@NotEmpty
 	@Column(name="description")
     private String description;
 
@@ -54,15 +58,18 @@ public class Place {
 	@Column(name="is_unesco")
     private boolean isUnesco; 
 	
+	@URL
 	@Column(name="unesco_url")
     private String unescoUrl; 
 	
 	@Column(name="status")
     private int status;  
 	
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created")
 	private Date created;
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="updated")
 	private Date updated;
 
@@ -71,31 +78,34 @@ public class Place {
 
 	@ManyToOne
 	@JoinColumn(name="created_by")
+	@JsonIgnore 
     private User createdBy; 
 
 	@ManyToOne
 	@JoinColumn(name="updated_by")
+	@JsonIgnore 
     private User updatedBy; 
-	
 	
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name="PLACE_TYPE", joinColumns=@JoinColumn(name="PLACE_ID"))
 	@Column(name="TYPE")
 	private Set<String> placeTypes = new HashSet<String>(0);
-		
+
 	@OneToMany(mappedBy="place", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	@JsonIgnore 
 	private List<PlaceLink> placeLinks = new ArrayList<PlaceLink>();
 
 	@OneToMany(mappedBy="place", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = false)
+	@JsonIgnore 
 	private Set<Image> placeImages = new HashSet<Image>();
 	
 	public Place(){
 	}
 	
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	
@@ -147,6 +157,12 @@ public class Place {
 		return placeImages;
 	}
 
+	public int getImageCount() {
+		if (placeImages != null)
+			return placeImages.size();
+		else return 0;
+	}
+	
 	public void setPlaceImages(Set<Image> placeImages) {
 		this.placeImages = placeImages;
 	}
@@ -171,6 +187,18 @@ public class Place {
 		return status;
 	}
 
+	//TODO: message.properties
+	public String getStatusStr() {
+		if (getStatus() == STATUS_PENDING)
+			return "Pending";
+		else if (getStatus() == STATUS_READY) 
+			return "Ready";
+		else if (getStatus() == STATUS_PUBLISHED) 
+			return "Published";
+		else return "Unknown";
+
+	}
+	
 	public void setStatus(int status) {
 		this.status = status;
 	}

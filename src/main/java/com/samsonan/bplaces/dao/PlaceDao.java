@@ -8,6 +8,7 @@ import com.samsonan.bplaces.model.PlaceFilters;
 public interface PlaceDao {
 
 	Set<Place> findAll(PlaceFilters filters);
+	Set<Place> findAllMyPlaces();
 
 	Place findById(int id);
 

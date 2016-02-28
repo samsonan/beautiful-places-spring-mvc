@@ -22,6 +22,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,7 +33,7 @@ import com.samsonan.bplaces.model.Image;
 import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.service.ImageService;
 import com.samsonan.bplaces.service.PlaceService;
-import com.samsonan.bplaces.util.validation.FileValidator;
+import com.samsonan.bplaces.util.validation.ImageFormValidator;
 
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -55,12 +56,11 @@ public class MediaController {
     PlaceService placeService;
     
     @Autowired
-    FileValidator fileValidator;
+    ImageFormValidator fileValidator;
  
-    @InitBinder("fileBucket")
-    protected void initBinderFileBucket(WebDataBinder binder) {
-    	//TODO:
-        //binder.setValidator(fileValidator);
+    @InitBinder("imageForm")
+    protected void initBinderImageForm(WebDataBinder binder) {
+        binder.setValidator(fileValidator);
     }
      
     @RequestMapping(value = { "/places/add-image-{placeId}" }, method = RequestMethod.GET)
@@ -69,8 +69,9 @@ public class MediaController {
     	Place place = placeService.findById(placeId);
         model.addAttribute("place", place);
         
-    	ImageUploadForm fileModel = new ImageUploadForm();
-        model.addAttribute("fileBucket", fileModel);
+    	ImageUploadForm imageForm = new ImageUploadForm();
+    	imageForm.setTitle(place.getTitle());
+        model.addAttribute("imageForm", imageForm);
  
         List<Image> images =  imageService.findAllByPlaceId(placeId);
         model.addAttribute("images", images);
@@ -78,6 +79,10 @@ public class MediaController {
         return "manage_images";
     }
 
+    /**
+     * 
+     * Edit function will be added later, or not
+     * 
     @RequestMapping(value = { "/places/edit-image-{placeId}-{imageId}" }, method = RequestMethod.GET)
     public String editImage(ModelMap model, @PathVariable int placeId, @PathVariable int imageId) throws IOException {
 
@@ -86,21 +91,15 @@ public class MediaController {
 
     	Image image = imageService.findById(imageId);
 
-    	ImageUploadForm fileModel = new ImageUploadForm();
-    	fileModel.setDescription(image.getDescription());
+    	ImageUploadForm imageForm = new ImageUploadForm();
+    	imageForm.setTitle(image.getTitle());
+    	imageForm.setDescription(image.getDescription());
+		imageForm.setEditImageSrc(image.getImageSrc());
 
     	if (image.getContentType().equals(Image.CONTENT_TYPE_URL)) { 
-        	fileModel.setImageUrl(image.getFilename());
-    	} else {
-        	File file = new File(UPLOAD_LOCATION+image.getFilename());
-        	
-            FileInputStream input = new FileInputStream(file);
-            MultipartFile multipartFile = new MockMultipartFile("file",
-            		image.getFilename(), image.getContentType(), IOUtils.toByteArray(input));    	
-        	
-        	fileModel.setFile(multipartFile);
+    		imageForm.setImageUrl(image.getFilename());
     	}
-        model.addAttribute("fileBucket", fileModel);
+    	model.addAttribute("imageForm", imageForm);
  
         List<Image> images =  imageService.findAllByPlaceId(placeId);
         model.addAttribute("images", images);
@@ -108,14 +107,8 @@ public class MediaController {
         return "manage_images";
     }
 
-    @RequestMapping(value = { "/places/delete-image-{placeId}-{imageId}" }, method = RequestMethod.GET)
-    public String deleteDocument(@PathVariable int placeId, @PathVariable int imageId) {
-        imageService.deleteById(imageId);
-        return "redirect:/add-image-"+placeId;
-    }  
-    
-    @RequestMapping(value = { "/places/add-image-{placeId}" }, method = RequestMethod.POST)
-    public String uploadImage(@Valid ImageUploadForm fileBucket, BindingResult result, ModelMap model, @PathVariable int placeId) throws Exception{
+    @RequestMapping(value = { "places/edit-image-{placeId}-{imageId}" }, method = RequestMethod.POST)
+    public String editImage(@ModelAttribute("imageForm") @Valid ImageUploadForm imageForm, BindingResult result, ModelMap model, @PathVariable int placeId) throws Exception{
          
         if (result.hasErrors()) {
 
@@ -131,10 +124,46 @@ public class MediaController {
             Place place = placeService.findById(placeId);
             model.addAttribute("place", place);
  
-            if (!fileBucket.getFile().isEmpty())
-            	saveImageFromFile(fileBucket, place);
-            else if (!fileBucket.getImageUrl().isEmpty())
-            	saveImageFromUrl(fileBucket, place); //TODO: check if available
+            if (!imageForm.getFile().isEmpty())
+            	saveImageFromFile(imageForm, place);
+            else if (!imageForm.getImageUrl().isEmpty())
+            	saveImageFromUrl(imageForm, place); //TODO: check if available
+            else //TODO: correct exception
+            	throw new Exception();
+ 
+            return "redirect:/places/add-image-"+placeId;
+        }
+    }
+    
+    */
+    
+    @RequestMapping(value = { "/places/delete-image-{placeId}-{imageId}" }, method = RequestMethod.GET)
+    public String deleteDocument(@PathVariable int placeId, @PathVariable int imageId) {
+        imageService.deleteById(imageId);
+        return "redirect:/add-image-"+placeId;
+    }  
+    
+    @RequestMapping(value = { "/places/add-image-{placeId}" }, method = RequestMethod.POST)
+    public String uploadImage(@ModelAttribute("imageForm") @Valid ImageUploadForm imageForm, BindingResult result, ModelMap model, @PathVariable int placeId) throws Exception{
+         
+        if (result.hasErrors()) {
+
+        	Place place = placeService.findById(placeId);
+            model.addAttribute("place", place);
+ 
+            List<Image> image = imageService.findAllByPlaceId(placeId);
+            model.addAttribute("image", image);
+             
+            return "manage_images";
+        } else {
+             
+            Place place = placeService.findById(placeId);
+            model.addAttribute("place", place);
+ 
+            if (!imageForm.getFile().isEmpty())
+            	saveImageFromFile(imageForm, place);
+            else if (!imageForm.getImageUrl().isEmpty())
+            	saveImageFromUrl(imageForm, place); //TODO: check if available
             else //TODO: correct exception
             	throw new Exception();
  
@@ -142,24 +171,26 @@ public class MediaController {
         }
     }    
 
-    private void saveImageFromUrl(ImageUploadForm fileBucket, Place place) throws IOException{
+    private void saveImageFromUrl(ImageUploadForm imageForm, Place place) throws IOException{
     	
         Image image = new Image();
-        image.setDescription(fileBucket.getDescription());
+        image.setTitle(imageForm.getTitle());
+        image.setDescription(imageForm.getDescription());
         image.setContentType("URL");
-        image.setFilename(fileBucket.getImageUrl());
+        image.setFilename(imageForm.getImageUrl());
         image.setPlace(place);
         imageService.saveImage(image);
     	
     }
     
-    private void saveImageFromFile(ImageUploadForm fileBucket, Place place) throws IOException{
+    private void saveImageFromFile(ImageUploadForm imageForm, Place place) throws IOException{
         
         Image image = new Image();
          
-        MultipartFile multipartFile = fileBucket.getFile();
+        MultipartFile multipartFile = imageForm.getFile();
          
-        image.setDescription(fileBucket.getDescription());
+        image.setDescription(imageForm.getDescription());
+        image.setTitle(imageForm.getTitle());
         image.setContentType(multipartFile.getContentType());
         image.setContent(multipartFile.getBytes());//saving content to DB - not used now
         

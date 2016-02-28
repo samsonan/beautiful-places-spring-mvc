@@ -3,27 +3,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
-	<head>
 
-		<title>Create / Update Place</title>
-
-		<spring:url value="/resources/core/css/main.css" var="mainCss" />
-		<spring:url
-			value="/resources/bootstrap-3.3.6-dist/css/bootstrap.min.css"
-			var="bootstrapCss" />
-		
-		<!-- Bootstrap core CSS -->
-		<link href="${bootstrapCss}" rel="stylesheet" />
-		<!-- Custom project CSS -->
-		<link href="${mainCss}" rel="stylesheet" />
-
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
-	</head>
-
-	<body>
-
-		<jsp:include page="nav_bar.jsp" />
+<jsp:include page="../fragments/header.jsp" />
 
 		<div class="container-fluid"  style="margin-top:50px;">
 			<div class="row content">
@@ -61,6 +42,9 @@
 							</div>
 						</div>
 						
+						<div class="form-group">
+							<form:errors path="placeTypes" cssClass="text-danger" style="margin-left:5%"/>
+						</div> 
 						<div class="form-group bg-success">
 							<label class="control-label col-sm-2" for="type">Type (nature):</label>
 							<div class="col-sm-5 bg-success">
@@ -72,6 +56,7 @@
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="RIVER"/>River</label></div>
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="VOLC"/>Volcano</label></div>
 							</div>
+							
 						</div>
 						<div class="form-group bg-warning">
 							<label class="control-label col-sm-2" for="type">Type (culture):</label>
@@ -93,8 +78,8 @@
 						<div class="form-group" id="unescoPanel">
 							<label class="control-label col-sm-2" for="unesco_url">UNESCO page URL:</label>
 							<div class="col-sm-10">
-								<input class="form-control"  id="unesco_url" placeholder="Link to this Place on UNESCO site"/>
-								<form:errors class="error"/>
+								<form:input class="form-control" path="unescoUrl" id="unescoUrl" placeholder="Link to this Place on UNESCO site"/>
+								<form:errors path="unescoUrl" cssClass="text-danger"/>
 							</div>
 						</div>
 						<div class="form-group">
@@ -110,22 +95,31 @@
 							<label class="control-label col-sm-2" for="lat">Latitude:</label>
 							<div class="col-sm-2">
 								<form:input class="form-control" id="lat" path="lat" placeholder="Latitude"/>
-								<form:errors path="lat" class="error"/>
+							</div>
+							<div class="col-sm-8">
+								<form:errors path="lat" cssClass="text-danger"/>							
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="control-label col-sm-2" for="lon">Longitude:</label>
 							<div class="col-sm-2">
 								<form:input class="form-control" id="lat" path="lon" placeholder="Longitude"/>
-								<form:errors path="lon" class="error"/>
+							</div>
+							<div class="col-sm-8">
+								<form:errors path="lon" cssClass="text-danger"/>							
 							</div>
 						</div>
 
+	
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								Links
 							</div>
 							<div class="panel-body">
+							
+								<div class="form-group" style="margin-left:5%">
+									<form:errors path="placeLinks" cssClass="text-danger"/>
+								</div> 
 								
 								<c:set var="last_idx" value="${place.placeLinks.size()}" />
 								
@@ -146,7 +140,7 @@
 
 								        <td><form:input path="placeLinks[${idx.index}].siteName" value="${link.siteName}" type="text" class="form-control" id="site_name" placeholder="Site Name"/></td>
 								        <td><form:input path="placeLinks[${idx.index}].url" value="${link.url}" type="text" class="form-control" id="site_url" placeholder="Site URL" /></td>
-								        <td><button type="del_link" class="btn btn-danger delLinkBtn" onclick="deleteRow(this)" >Delete</button></td>
+								        <td><button type="button" class="btn btn-danger delLinkBtn" onclick="deleteRow(this)" value="Delete" ></button></td>
 								
 								      </tr>
 								</c:forEach>
@@ -155,7 +149,7 @@
 								      <tr>
 								        <td><input name="placeLinks[<c:out value="${last_idx}" />].siteName" type="text" class="form-control" id="site_name" placeholder="Site Name"/></td>
 								        <td><input name="placeLinks[<c:out value="${last_idx}" />].url" type="text" class="form-control"	id="site_url" placeholder="Site URL" /></td>
-								        <td><button type="del_link" class="btn btn-danger delLinkBtn" onclick="deleteRow(this)" >Delete</button></td>
+								        <td><button type="button" class="btn btn-danger delLinkBtn" onclick="deleteRow(this)" value="Delete" ></button></td>
 								      </tr>
 								      	
 
@@ -187,20 +181,6 @@
 			</div>
 		</div> <!-- container-fluid -->
 
-
-		<footer class="container-fluid text-center">
-			<p>
-				Footer Text
-			</p>
-		</footer>
-
-		<!-- Bootstrap core JavaScript
-		================================================== -->
-		<!-- Placed at the end of the document so the pages load faster -->
-		<script>
-			window.jQuery || document.write('<script src="http://getbootstrap.com//assets/js/vendor/jquery.min.js"><\/script>')
-		</script>
-		
 		<script>
 		
 			var table = document.getElementById('LinksTable'),
@@ -252,8 +232,17 @@
 				return tbody.rows.length > 1;
 			}
 			
-		</script>		
+	</script>		
 		
-		<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-	</body>
+	<script>
+  		$('#description').wysihtml5({
+    		toolbar: {
+      		fa: true
+    		}
+  		});
+	</script>
+
+	<jsp:include page="../fragments/footer.jsp" />
+
+</body>
 </html>

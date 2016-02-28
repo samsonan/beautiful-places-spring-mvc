@@ -12,7 +12,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
-//TODO: int to Integers
+import com.samsonan.bplaces.util.validation.ValidEmail;
+
 @Entity
 @Table(name="bplace_user")
 public class User { 
@@ -22,13 +23,13 @@ public class User {
 	@Id
 	@Column(name="id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;  
+    private Integer id;  
 	
-    @NotEmpty
+    @NotEmpty(message = "{NotEmpty.user.name}")
 	@Column(name="name")
     private String name;
 
-    //@ValidEmail
+    @ValidEmail
     @NotEmpty
 	@Column(name="email")
     private String email;
@@ -39,7 +40,7 @@ public class User {
 	@Column(name="last_name")
     private String lastName; 
 
-    @NotEmpty
+    @NotEmpty(message = "{NotEmpty.user.password}")
 	@Column(name="password")
     private String password;
 
@@ -49,11 +50,11 @@ public class User {
 	@Column(name="role")
     private String role;
    
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

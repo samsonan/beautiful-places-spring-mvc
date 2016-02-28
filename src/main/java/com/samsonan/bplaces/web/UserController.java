@@ -22,10 +22,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.samsonan.bplaces.form.UserFormValidator;
 import com.samsonan.bplaces.model.User;
 import com.samsonan.bplaces.service.UserService;
 import com.samsonan.bplaces.service.impl.MailService;
+import com.samsonan.bplaces.util.validation.UserFormValidator;
 
 
 @Controller
@@ -49,19 +49,19 @@ public class UserController {
 	
 	@RequestMapping(value = {"/login"}, method = RequestMethod.GET)
 	public String login() {
-		return "login";
+		return "users/login";
 	}
 
 	@RequestMapping(value = {"/register"}, method = RequestMethod.GET)
 	public String register(ModelMap model) {
         User user = new User();
         model.addAttribute("user", user);
-		return "register";
+		return "users/register";
 	}	
 
 	@RequestMapping(value = {"/restore"}, method = RequestMethod.GET)
 	public String restore(ModelMap model) {
-		return "user_restore";
+		return "users/user_restore";
 	}	
 
     @RequestMapping(value = {"/restore"}, method = RequestMethod.POST)
@@ -83,7 +83,7 @@ public class UserController {
     	redirectAttributes.addFlashAttribute("css", "success");
 		redirectAttributes.addFlashAttribute("msg", "Message has been sent!");
         
-        return "redirect:/login";
+        return "redirect:users/login";
     }
 	
 	@RequestMapping(value = {"/register"}, method = RequestMethod.POST)
@@ -91,7 +91,7 @@ public class UserController {
 			  BindingResult result) {
 		
     	if (result.hasErrors()) {
-            return "/register";
+            return "users/register";
         }
  
     	try{
@@ -101,7 +101,7 @@ public class UserController {
     		logger.error("Error registering user", ex);
     	}
  
-		return "redirect:/map";
+		return "redirect:map";
 	}	
 	
 	@RequestMapping(value = {"/users","/users/list"}, method = RequestMethod.GET)
@@ -111,7 +111,7 @@ public class UserController {
 
 		model.addAttribute("userList", list);
 
-		return "user_list";
+		return "users/user_list";
 	}
 
 	@RequestMapping(value = {"/users/me"}, method = RequestMethod.GET)
@@ -122,7 +122,7 @@ public class UserController {
 	      
 		User user = userService.findByName(name);
         model.addAttribute("userForm", user);
-		return "user_form";
+		return "users/user_form";
 	}	
 	
 	/**
@@ -133,7 +133,7 @@ public class UserController {
 	public String addUser(ModelMap model) {
         User user = new User();
         model.addAttribute("userForm", user);
-		return "user_form";
+		return "users/user_form";
 	}	
 
 	
@@ -144,7 +144,7 @@ public class UserController {
 		User user = userService.findById(id);
 		model.addAttribute("userForm", user);
 		
-		return "user_form";
+		return "users/user_form";
 
 	}	
 	
@@ -153,7 +153,7 @@ public class UserController {
 			  BindingResult result, final RedirectAttributes redirectAttributes) {
 		
     	if (result.hasErrors()) {
-            return "user_form";
+            return "users/user_form";
         }
  
     	// Add message to flash scope
@@ -166,7 +166,7 @@ public class UserController {
     				
    		userService.saveUser(user);
  
-		return "redirect:/users/list";
+		return "redirect:users/list";
 	}		
 	
 	
@@ -181,7 +181,7 @@ public class UserController {
 		redirectAttributes.addFlashAttribute("css", "success");
 		redirectAttributes.addFlashAttribute("msg", "User is deleted!");
 		
-		return "redirect:/users/list";
+		return "redirect:users/list";
 
 	}	
 	

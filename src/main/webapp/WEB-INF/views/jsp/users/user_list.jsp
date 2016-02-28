@@ -6,24 +6,9 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-<title>Beautiful Places</title>
-
-<spring:url value="/resources/core/css/main.css" var="mainCss" />
-<spring:url
-	value="/resources/bootstrap-3.3.6-dist/css/bootstrap.min.css"
-	var="bootstrapCss" />
-
-<!-- Bootstrap core CSS -->
-<link href="${bootstrapCss}" rel="stylesheet" />
-<!-- Custom project CSS -->
-<link href="${mainCss}" rel="stylesheet" />
-
-</head>
+<jsp:include page="../fragments/header.jsp" />
 
 <body>
-
-	<jsp:include page="nav_bar.jsp" />
 
 	<div class="container" style="margin-top: 50px;">
 
@@ -79,14 +64,8 @@
 
 	</div>
 
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
-	<spring:url value="/resources/core/js/main.js" var="mainJs" />
-	<spring:url value="/resources/bootstrap-3.3.6-dist/js/bootstrap.min.js" var="bootstrapJs" />
-
-	<script src="${mainJs}"></script>
-	<script src="${bootstrapJs}"></script>
+	<jsp:include page="../fragments/footer.jsp" />
 
 </body>
 </html>

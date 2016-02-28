@@ -3,40 +3,19 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<title>Beautiful Places</title>
 
-<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-	
-<spring:url value="/resources/core/css/main.css" var="mainCss" />
+<jsp:include page="fragments/header.jsp" />
+
 <spring:url value="/resources/core/css/map.css" var="mapCss" />
-<spring:url
-	value="/resources/bootstrap-3.3.6-dist/css/bootstrap.min.css"
-	var="bootstrapCss" />
-
-<link href="${bootstrapCss}" rel="stylesheet" />
-<link href="${mainCss}" rel="stylesheet" />
 <link href="${mapCss}" rel="stylesheet" />
-
-<link rel="stylesheet"
-	href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" />
-
-</head>
-<body>
-
-	<div class="container">
-
-		<jsp:include page="nav_bar.jsp" />
-
-		</div></nav> <!-- map plug-in bug workaround -->
 
 		<div class="navbar-offset"></div>
 		<div id="map-canvas">
 			<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
 		</div>
-		<div class="row main-row">
+		<div class="row main-row" >
 			<div class="col-sm-4 col-md-2 sidebar sidebar-left pull-left">
+
 				<div class="panel-group sidebar-body" id="accordion-left">
 					<div class="panel panel-default">
 						<div class="panel-heading">
@@ -49,8 +28,8 @@
 							</h4>
 						</div>
 						<div id="layers" class="panel-collapse collapse in">
-							<div class="panel-body">
-								<jsp:include page="filters.jsp" >
+							<div class="panel-body" id="main-panel-body">
+								<jsp:include page="fragments/filters.jsp" >
 									<jsp:param name="is_search" value="false" />
 									<jsp:param name="is_location" value="false" />
 								</jsp:include>
@@ -64,11 +43,9 @@
 		<div class="mini-submenu mini-submenu-left pull-left">
 			<i class="fa fa-list-alt"></i>
 		</div>
-	</div>
-
-
 
 	<script>
+	
 		markerInfo = [
 				<c:forEach items="${placeList}" var="s">[
 						<c:out value="${s.lat}"/>, <c:out value="${s.lon}"/>, '<c:out value="${s.title}"/>',<c:out value="${s.id}"/>
@@ -116,7 +93,6 @@
 				    infowindow.close();
 				});				
 			}
-
 		}
 
 		function bindInfoWindow(marker, map, infowindow, html) { 
@@ -129,29 +105,7 @@
 		google.maps.event.addDomListener(window, 'load', initialize);
 	</script>
 
-	<spring:url value="/resources/core/js/ol.js" var="olJs" />
-	<spring:url value="/resources/core/js/main.js" var="mainJs" />
-	<spring:url value="/resources/bootstrap-3.3.6-dist/js/bootstrap.min.js"
-		var="bootstrapJs" />
-
-	<script src="${mainJs}"></script>
-	<script src="${bootstrapJs}"></script>
-
-
 	<script type="text/javascript">
-		function applyMargins() {
-			var leftToggler = $(".mini-submenu-left");
-			if (leftToggler.is(":visible")) {
-				$("#map .ol-zoom").css("margin-left", 0).removeClass(
-						"zoom-top-opened-sidebar").addClass(
-						"zoom-top-collapsed");
-			} else {
-				$("#map .ol-zoom").css("margin-left",
-						$(".sidebar-left").width()).removeClass(
-						"zoom-top-opened-sidebar").removeClass(
-						"zoom-top-collapsed");
-			}
-		}
 
 		function isConstrained() {
 			return $(".sidebar").width() == $(window).width();
@@ -169,7 +123,7 @@
 				var thisEl = $(this);
 				thisEl.closest('.sidebar-body').fadeOut('slide', function() {
 					$('.mini-submenu-left').fadeIn();
-					applyMargins();
+					
 				});
 			});
 
@@ -177,17 +131,18 @@
 				var thisEl = $(this);
 				$('.sidebar-left .sidebar-body').toggle('slide');
 				thisEl.hide();
-				applyMargins();
+				
 			});
 
-			$(window).on("resize", applyMargins);
-
 			applyInitialUIState();
-			applyMargins();
+			
 		});
 	</script>
+	
 
 
+
+	<jsp:include page="fragments/footer.jsp" />
 
 </body>
 </html>

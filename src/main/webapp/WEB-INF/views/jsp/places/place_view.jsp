@@ -2,41 +2,10 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sec"	uri="http://www.springframework.org/security/tags" %>
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
 
-<title><c:out value="${place.title}" /> information</title>
-
-<spring:url value="/resources/core/css/main.css" var="mainCss" />
-<spring:url
-	value="/resources/bootstrap-3.3.6-dist/css/bootstrap.min.css"
-	var="bootstrapCss" />
-
-<!-- Bootstrap core CSS -->
-<link href="${bootstrapCss}" rel="stylesheet" />
-<!-- Custom project CSS -->
-<link href="${mainCss}" rel="stylesheet" />
-
-<style>
-  .carousel-inner {
-      width: 100%;
-      margin: auto;
-	  max-height: 500px !important;
-  }
-  .crsl-image {
-  		width: auto;
-  		height:500px;
-  		max-height:500px;
-  }
-  </style>
-  
-</head>
-
-<body>
-
-	<jsp:include page="nav_bar.jsp" />
+<jsp:include page="../fragments/header.jsp" />
 
 	<div class="container-fluid" style="margin-top: 50px;">
 		<div class="row content">
@@ -142,20 +111,8 @@
 		</div>
 	</div>
 
-	<footer class="container-fluid text-center">
-		<p>Footer Text</p>
-	</footer>
 
-	<!-- Bootstrap core JavaScript
-		================================================== -->
-	<!-- Placed at the end of the document so the pages load faster -->
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script>
-		window.jQuery
-				|| document
-						.write('<script src="http://getbootstrap.com//assets/js/vendor/jquery.min.js"><\/script>')
-	</script>
-	<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+	<jsp:include page="../fragments/footer.jsp" />
+
 </body>
 </html>

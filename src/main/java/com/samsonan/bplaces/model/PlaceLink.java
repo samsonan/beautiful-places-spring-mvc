@@ -12,8 +12,15 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.URL;
 
-//TODO: int id to integer
+/**
+ * TODO: check url availability
+ * TODO: should be filled both url and name or none
+ * @author ShamanXXI
+ *
+ */
 @Entity
 @Table(name="place_link")
 public class PlaceLink {
@@ -21,11 +28,14 @@ public class PlaceLink {
 	@Id
 	@Column(name="id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;  
+    private Integer id;  
 	
+	@NotEmpty(message = "{NotEmpty.place_link.name}")
 	@Column(name="site_name")
     private String siteName;
 
+
+	@URL(message="{URL.place_link.url}")
 	@Column(name="url")
     private String url;
 
@@ -49,11 +59,11 @@ public class PlaceLink {
 		this.place = place;
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

@@ -1,19 +1,10 @@
 body {
-	overflow: hidden;
+	height:100%;
+	overflow:hidden;
 }
 
 .navbar-offset {
 	margin-top: 60px;
-}
-
-#map {
-	position: absolute;
-	top: 50px;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
-
-	z-index: 35;
 }
 
 .zoom-top-opened-sidebar {
@@ -30,7 +21,6 @@ body {
 	border: 1px solid rgba(0, 0, 0, 0.9);
 	border-radius: 4px;
 	padding: 9px;
-	/*position: relative;*/
 	width: 42px;
 	text-align: center;
 }

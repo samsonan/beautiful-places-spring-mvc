@@ -1,9 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-<form:form method="POST" modelAttribute="filters" role="form">
 
-	<c:if test="${param.is_search}">
+<form:form id="filter-form" method="POST" modelAttribute="filters" role="form">
+
+	<c:if test="${param.is_search and false}">
 		<div class="input-group">
 			<input type="text" class="form-control" placeholder="Search...">
 			<span class="input-group-btn">
@@ -113,14 +114,76 @@
 
 
 	<div class="btn-group" style="margin-top: 20px">
-		<button type="submit" class="btn btn-primary"  name="filter.apply">Apply</button>
+		<button type="submit" id="btn-filter-apply" class="btn btn-primary"  name="filter.apply">Apply</button>
 		<button class="btn btn-default" name="filter.reset">Reset</button>
 		<!-- button class="btn btn-default" name="filter.save">Save</button-->
 	</div>
 
 </form:form>
 
+
 <script>
+	jQuery(document).ready(function($) {
+
+		$("#filter-form").submit(function(event) {
+
+			// Disble the search button
+			enableFilterButton(false);
+	
+			// Prevent the form from submitting via the browser.
+			event.preventDefault();
+
+			filterAjax();
+
+		});
+
+	});
+	
+	function filterAjax() {
+
+		var search = {}
+		search["naturalTypes"] = $("#naturalTypes").val();
+		search["culturalTypes"] = $("#culturalTypes").val();
+		
+		$.ajax({
+			type : "POST",
+			beforeSend: function (request)
+            {
+                request.setRequestHeader("X-CSRF-TOKEN", "${_csrf.token}");
+            },
+			contentType : "application/json",
+			url : "${home}/api/getFilterResult",
+			data : JSON.stringify(search),
+			dataType : 'json',
+			timeout : 100000,
+			success : function(data) {
+				console.log("SUCCESS: ", data);
+				display(data);
+			},
+			error : function(e) {
+				console.log("ERROR: ", e);
+				display(e);
+			},
+			done : function(e) {
+				console.log("DONE");
+				enableFilterButton(true);
+			}
+		});
+	
+	}
+
+	function enableFilterButton(flag) {
+		$("#btn-filter-apply").prop("disabled", flag);
+	}
+	
+	function display(data) {
+	}
+</script>
+	
+<script>
+
+$(function() {
+
 	$("#checkNatureAll").click(function() {
 		$(".checkNature").prop('checked', $(this).prop('checked'));
 	});
@@ -128,4 +191,6 @@
 	$("#checkCultureAll").click(function() {
 		$(".checkCulture").prop('checked', $(this).prop('checked'));
 	});
+	
+});
 </script>

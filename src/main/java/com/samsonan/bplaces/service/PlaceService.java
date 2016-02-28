@@ -11,6 +11,7 @@ public interface PlaceService {
 
     Set<Place> findAll(); 
     Set<Place> findAll(PlaceFilters filters); 
+    Set<Place> findAllMyPlaces();
 	
     void savePlace(Place place);
      

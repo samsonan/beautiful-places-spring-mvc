@@ -45,5 +45,10 @@ public class PlaceServiceImpl implements PlaceService {
 	public int getImgCountForPlace(int id){
 		return dao.getImgCountForPlace(id);
 	}
+
+	@Override
+	public Set<Place> findAllMyPlaces() {
+		return dao.findAllMyPlaces();
+	}
 	
 }

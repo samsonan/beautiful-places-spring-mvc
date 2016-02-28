@@ -34,7 +34,7 @@ public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements Pl
 	    String name = auth.getName(); //get logged in username
 	    User user = userDao.findByName(name);
 		
-		if (findById(place.getId()) != null) {
+		if (place.getId() != null) {
 			place.setUpdated(new Date());
 			place.setUpdatedBy(user);
 			merge(place);
@@ -96,5 +96,18 @@ public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements Pl
 		query.setInteger("id", id);
 		return ((Long) query.uniqueResult()).intValue();
 	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Set<Place> findAllMyPlaces() {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String name = auth.getName(); 
+	    
+	    Query query = getSession().createQuery("from Place p where p.createdBy.name = :name  ");
+	    query.setString("name",name);
+		
+        return new HashSet<>(query.list());
+    }
 
 } 

@@ -13,13 +13,18 @@ import javax.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.samsonan.bplaces.dao.LocationDao;
@@ -28,6 +33,7 @@ import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.model.PlaceFilters;
 import com.samsonan.bplaces.model.PlaceLink;
 import com.samsonan.bplaces.service.PlaceService;
+import com.samsonan.bplaces.util.validation.PlaceFormValidator;
 
 @Controller
 public class PlaceController {
@@ -40,6 +46,14 @@ public class PlaceController {
 	@Autowired
 	LocationDao locationDao; //TODO: use service?
 
+	@Autowired
+	PlaceFormValidator placeFormValidator;
+	
+	@InitBinder("place")
+	protected void initBinder(WebDataBinder binder) {
+		binder.setValidator(placeFormValidator);
+	}		
+	
 	@RequestMapping(value = {"/", "/map"}, method = RequestMethod.GET)
 	public String mapPlaces(Model model) {
 		
@@ -55,7 +69,7 @@ public class PlaceController {
 	}
 
 	@RequestMapping(value = {"/", "/map"}, params = "filter.apply", method = RequestMethod.POST)
-	public String mapApplyFilter(@ModelAttribute("filters") @Valid PlaceFilters filters, 
+	public String mapApplyFilter(@ModelAttribute("filters") PlaceFilters filters, 
 			Model model) {
 		
 		Set<Place> set = placeService.findAll(filters);
@@ -66,7 +80,7 @@ public class PlaceController {
 	}		
 
 	@RequestMapping(value = {"/", "/map"}, params = "filter.reset", method = RequestMethod.POST)
-	public String mapResetFilters(@ModelAttribute("filters") @Valid PlaceFilters filters, 
+	public String mapResetFilters(@ModelAttribute("filters") PlaceFilters filters, 
 			Model model) {
 		
 		return resetFilters(model);
@@ -79,13 +93,25 @@ public class PlaceController {
 		
 		return "map";
 	}
+
+	@RequestMapping(value = {"/places/me"}, method = RequestMethod.GET)
+	public ModelAndView myPlaces() {
+
+		Set<Place> set = placeService.findAllMyPlaces();
+		ModelAndView model = new ModelAndView("places/place_list_brief");
+		model.addObject("placeList", set);
+		model.addObject("mode","me");
+		return model;
+	}
+	
 	
 	@RequestMapping(value = {"/places/list_admin"}, method = RequestMethod.GET)
-	public ModelAndView listPlaces2() {
+	public ModelAndView listPlacesForAdmin() {
 
 		Set<Place> set = placeService.findAll();
-		ModelAndView model = new ModelAndView("place_list_admin");
+		ModelAndView model = new ModelAndView("places/place_list_brief");
 		model.addObject("placeList", set);
+		model.addObject("mode","admin");
 		return model;
 	}
 
@@ -94,7 +120,7 @@ public class PlaceController {
 
 		resetFilters(model);
 
-		return "place_list";
+		return "places/place_list";
 	}
 	
     @RequestMapping(value = { "/places/add" }, method = RequestMethod.GET)
@@ -102,7 +128,7 @@ public class PlaceController {
         
     	Place place = new Place();
         model.addAttribute("place", place);
-        return "place_edit";
+        return "places/place_edit";
     }	
 
     @RequestMapping(value = { "/places/edit-place-{id}" }, method = RequestMethod.GET)
@@ -110,27 +136,27 @@ public class PlaceController {
     	
     	Place place = placeService.findById(id);
         model.addAttribute("place", place);
-        return "place_edit";
+        return "places/place_edit";
     }	
 
     @RequestMapping(value = { "/places/view-place-{id}" }, method = RequestMethod.GET)
     public String viewPlace(@PathVariable int id, ModelMap model) {
         Place place = placeService.findById(id);
         model.addAttribute("place", place);
-        return "place_view";
+        return "places/place_view";
     }    
         
     @RequestMapping(value = { "/places/delete-place-{id}" }, method = RequestMethod.GET)
-    public String deletePlace(@PathVariable int id) {
+    public String deletePlace(@PathVariable int id, HttpServletRequest request) {
         placeService.deleteById(id);
-        return "redirect:list";
+        return "redirect:list_admin";
     }    
 
     @RequestMapping(value = { "/places/add","/places/edit-place-{id}" }, params = "edit.save.exit", method = RequestMethod.POST)
     public String savePlaceExit(@Valid Place place, BindingResult result, HttpServletRequest request) {
 
     	if (savePlace(place, result) < 1)
-            return "place_edit";
+            return "places/place_edit";
  
         return "redirect:list";
     }    
@@ -141,27 +167,36 @@ public class PlaceController {
     	if (savePlace(place, result) < 1)
             return "place_edit";
     	
-        return "redirect:/places/add-image-"+place.getId();
+        return "redirect:add-image-"+place.getId();
     }    
 
     private int savePlace(@Valid Place place, BindingResult result){
 
+    	boolean isError = false;
+    	
     	if (result.hasErrors()) {
-            return -1;
+    		isError = true;    		
         }
  
     	//place links are detached, with no place id
+    	//in case of error - remove empty links because they are added automatically on the page
     	for (Iterator<PlaceLink> iterator = place.getPlaceLinks().iterator(); iterator.hasNext();) {
     		PlaceLink link = iterator.next();
-    		if (link.getSiteName().isEmpty() || link.getUrl().isEmpty())
+    		if ((link.getSiteName() == null && link.getUrl() == null) ||
+    				(link.getSiteName().isEmpty() && link.getUrl().isEmpty()))
     			iterator.remove();
-    		else
+    		else if (!isError)
     			link.setPlace(place);
     	}
     	
-    	logger.debug("img count for place {0} is {1}",place.getId(),placeService.getImgCountForPlace(place.getId()));
+    	if (isError) return -1;
     	
-    	place.setStatus(placeService.findById(place.getId()).getPlaceImages().size()==0?Place.STATUS_PENDING:Place.STATUS_READY);
+    	if (place.getId() != null) { 
+    		logger.debug("img count for place {0} is {1}",place.getId(),placeService.getImgCountForPlace(place.getId()));
+    		place.setStatus(placeService.findById(place.getId()).getPlaceImages().size()==0?Place.STATUS_PENDING:Place.STATUS_READY);
+    	} else {
+    		place.setStatus(Place.STATUS_PENDING);
+    	}
     	
    		placeService.savePlace(place);
    		return 1;
@@ -171,7 +206,7 @@ public class PlaceController {
     @RequestMapping(value = { "/places/add","/places/edit-place-{id}", "/upload" }, params = "edit.cancel")
     public String cancelEdit() {
 
-        return "redirect:list";
+        return "redirect:places/list";
     }    
     
     @ModelAttribute("countryList")
@@ -179,6 +214,16 @@ public class PlaceController {
 
         return locationDao.findAllCountries();
     }	
+    
+    
+    @ResponseBody
+	@RequestMapping(value = "/api/getFilterResult", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public Set<Place> getSearchResultViaAjax(@RequestBody PlaceFilters filters) {
+
+    	Set<Place> result = placeService.findAll(filters);
+		//result will be converted into json format and send back to the request.
+		return result;
+	}
 	
 	
 }

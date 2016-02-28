@@ -3,72 +3,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sec"	uri="http://www.springframework.org/security/tags" %>
 
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<title>Bootstrap Example</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
+<jsp:include page="../fragments/header.jsp" />
 
-<spring:url value="/resources/core/css/main.css" var="mainCss" />
-<spring:url
-	value="/resources/bootstrap-3.3.6-dist/css/bootstrap.min.css"
-	var="bootstrapCss" />
 <spring:url value="/resources/core/css/simple-sidebar.css"
 	var="sidebarCss" />
-
-<!-- Bootstrap core CSS -->
-<link href="${bootstrapCss}" rel="stylesheet" />
-<!-- Custom project CSS -->
-<link href="${mainCss}" rel="stylesheet" />
-
 <link href="${sidebarCss}" rel="stylesheet" />
-
-<style>
-/* Set height of the grid so .sidenav can be 100% (adjust if needed) */
-.row.content {
-	height: 1500px
-}
-
-/* Set gray background color and 100% height */
-.sidenav {
-	margin-top:50px;
-	padding-top:10px;
-	background-color: #f1f1f1;
-	height: 100%;
-}
-
-/* Set black background color, white text and some padding */
-footer {
-	background-color: #555;
-	color: white;
-	padding: 15px;
-}
-
-/* On small screens, set height to 'auto' for sidenav and grid */
-@media screen and (max-width: 767px) {
-	.sidenav {
-		height: auto;
-		padding: 15px;
-	}
-	.row.content {
-		height: auto;
-	}
-}
-</style>
-</head>
-<body>
-
-	<jsp:include page="nav_bar.jsp" />
-
 
 	<div class="container-fluid">
 		<div class="row content">
 			<div class="col-sm-2 sidenav">
 
-				<jsp:include page="filters.jsp" >
+				<jsp:include page="../fragments/filters.jsp" >
 					<jsp:param name="is_search" value="true" />
 					<jsp:param name="is_location" value="true" />
 				</jsp:include>
@@ -123,26 +71,8 @@ footer {
 		</div>
 	</div>
 
-	<footer class="container-fluid">
-		<p>Footer Text</p>
-	</footer>
 
-
-	<!-- Placed at the end of the document so the pages load faster -->
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-	<script>
-		window.jQuery
-				|| document
-						.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"><\/script>')
-	</script>
-
-	<spring:url value="/resources/core/js/main.js" var="mainJs" />
-	<spring:url value="/resources/bootstrap-3.3.6-dist/js/bootstrap.min.js"
-		var="bootstrapJs" />
-
-	<script src="${mainJs}"></script>
-	<script src="${bootstrapJs}"></script>
+	<jsp:include page="../fragments/footer.jsp" />
 
 </body>
 </html>
