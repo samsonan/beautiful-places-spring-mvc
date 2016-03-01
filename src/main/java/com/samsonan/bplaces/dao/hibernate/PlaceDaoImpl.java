@@ -69,7 +69,7 @@ public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements Pl
 			criteria.add(Restrictions.in("pt.elements", resList));
 			
 			if (filters.isUnesco())
-				criteria.add(Restrictions.eq("unesco", "true"));
+				criteria.add(Restrictions.eq("isUnesco", "true"));
 		}
 		
         return new HashSet<>(criteria.list());

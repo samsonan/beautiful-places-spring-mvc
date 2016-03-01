@@ -23,11 +23,38 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     UserDao userDao;
 
+	@Autowired
+	MailService mailService;
+    
     @Override
     public User registerNewUser(User user) {
-    	//TODO: send email
         userDao.saveOrUpdate(user);
+        
+        //TODO:
+        //generate unique confirmation ID to your application. e.g. java.util.UUID.randomUUID().toString()
+        //store the ID with the account;
+        //Send the URL+ID (http://yourapp.com/confirm?id=UUID) as an email
+        //request mapping GET /confirm?id=UUID
+        //redirect somewhere
+        
+    	sendRegistrationEmail(user.getEmail());
         return user;
+    }
+    
+    private void sendRegistrationEmail(String email) {
+    	mailService.sendMail("samsonan.info@gmail.com", email, "bplaces registration", "hello");
+    }
+    
+    public void restoreUserPassword(User user) {
+    	
+    	//TODO:
+    	//generate UUID with exp date
+        //store the ID with the account;
+        //Send the URL+ID (http://yourapp.com/reset?id=UUID) as an email
+        //request mapping GET /reset?id=UUID
+    	//redirect to login
+    	
+    	mailService.sendMail("samsonan.info@gmail.com", user.getEmail(), "restore password", "restore");
     }
     
 	public List<User> findAll(){
@@ -42,6 +69,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	@Override
 	public User findByName(String name) {
 		return userDao.findByName(name);
+	}
+
+	@Override
+	public User findByEmail(String email) {
+		return userDao.findByEmail(email);
 	}
 	
 	@Override

@@ -11,9 +11,11 @@ public class PlaceFilters {
 	public final static String [] CULTURE_TYPES = {"TEMPLE", "VILLAGE"};
 	
     private boolean isUnesco = false; 
-    private boolean isCulture = true; 
-    private boolean isNature = true; 
 
+    /* only to maintain visual state of the filters */
+    private boolean isCulture = true; 
+    private boolean isNature = true;     
+        
 	private String [] naturalTypes;
 	private String [] culturalTypes;
 
@@ -21,8 +23,7 @@ public class PlaceFilters {
 		naturalTypes = NATURE_TYPES;
 		culturalTypes = CULTURE_TYPES;
 	}
-	
-	
+		
 	public boolean isUnesco() {
 		return isUnesco;
 	}
@@ -30,7 +31,7 @@ public class PlaceFilters {
 	public void setUnesco(boolean isUnesco) {
 		this.isUnesco = isUnesco;
 	}
-
+	
 	public boolean isCulture() {
 		return isCulture;
 	}
@@ -45,8 +46,7 @@ public class PlaceFilters {
 
 	public void setNature(boolean isNature) {
 		this.isNature = isNature;
-	}
-
+	}	
 
 	public String[] getNaturalTypes() {
 		return naturalTypes;
@@ -67,6 +67,9 @@ public class PlaceFilters {
 		this.culturalTypes = culturalTypes;
 	}
 
-	
+    @Override
+    public String toString() {
+        return "PlaceFilters [isUnesco=" + isUnesco + ", naturalTypes="+naturalTypes+", culturalTypes=" + culturalTypes + "]";
+    }	
 	
 }

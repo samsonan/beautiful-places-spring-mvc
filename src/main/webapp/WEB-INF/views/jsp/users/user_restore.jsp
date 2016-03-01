@@ -9,6 +9,7 @@
 <body>
 
 	<div class="container">
+	
 		<div id="restorebox" style="margin-top: 70px;"
 			class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
 			<div class="panel panel-default">
@@ -17,6 +18,13 @@
 				</div>
 
 				<div style="padding-top: 20px" class="panel-body">
+
+					<c:if test="${not empty msg}">
+						<div class="alert alert-${css} alert-dismissible" role="alert">
+							<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+							${msg}
+						</div>
+					</c:if>
 
 					<div style="display: none" id="restore-alert"
 						class="alert alert-danger col-sm-12"></div>

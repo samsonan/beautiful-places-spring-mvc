@@ -4,7 +4,6 @@ package com.samsonan.bplaces.web;
 import java.awt.image.BufferedImage;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +11,6 @@ import java.util.UUID;
 import javax.imageio.ImageIO;
 import javax.validation.Valid;
 
-import org.apache.commons.io.IOUtils;
 import org.imgscalr.Scalr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +32,6 @@ import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.service.ImageService;
 import com.samsonan.bplaces.service.PlaceService;
 import com.samsonan.bplaces.util.validation.ImageFormValidator;
-
-import org.springframework.mock.web.MockMultipartFile;
 
 /**
  * Plug-in used for preview: http://plugins.krajee.com/file-input#features

@@ -30,6 +30,7 @@ public class MailConfig {
 		props.setProperty("mail.smtp.auth", environment.getRequiredProperty("mail.smtp.auth"));
 		props.setProperty("mail.smtp.starttls.enable", environment.getRequiredProperty("mail.smtp.starttls.enable"));
 		props.setProperty("mail.debug", environment.getRequiredProperty("mail.debug"));
+		props.setProperty("mail.smtp.starttls.required", "true"); // added 
 		
 		mailSender.setJavaMailProperties(props);
 		

@@ -18,7 +18,10 @@ import com.samsonan.bplaces.util.validation.ValidEmail;
 @Table(name="bplace_user")
 public class User { 
 	
-	public final static String [] ROLE_LIST = {"ROLE_USER", "ROLE_ADMIN"};
+	public final static String ROLE_USER = "ROLE_USER";
+	public final static String ROLE_ADMIN = "ROLE_ADMIN";
+	
+	public final static String [] ROLE_LIST = {ROLE_USER, ROLE_ADMIN};
 	
 	@Id
 	@Column(name="id")

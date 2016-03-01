@@ -2,6 +2,7 @@ package com.samsonan.bplaces.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Spring annotation configuration to scan the service classes.
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan({ "com.samsonan.bplaces" })
+@EnableAsync
 public class AppConfig {
 
 }

@@ -29,7 +29,7 @@
 						</div>
 						<div id="layers" class="panel-collapse collapse in">
 							<div class="panel-body" id="main-panel-body">
-								<jsp:include page="fragments/filters.jsp" >
+								<jsp:include page="fragments/filters-ajax.jsp" >
 									<jsp:param name="is_search" value="false" />
 									<jsp:param name="is_location" value="false" />
 								</jsp:include>
@@ -45,20 +45,17 @@
 		</div>
 
 	<script>
-	
-		markerInfo = [
-				<c:forEach items="${placeList}" var="s">[
-						<c:out value="${s.lat}"/>, <c:out value="${s.lon}"/>, '<c:out value="${s.title}"/>',<c:out value="${s.id}"/>
-						,'<c:out value="${s.placeTypes}"/>'],
-				</c:forEach> ];
+
+		var markers = new Array();
+		var map;
 
 		function initialize() {
 			var mapOptions = {
 
-					<c:choose>
+				<c:choose>
 					<c:when test="${(not empty param.lat) and (not empty param.lon)}">
 						center : new google.maps.LatLng(${param.lat}, ${param.lon}),
-				</c:when>
+					</c:when>
 					<c:otherwise>
 						center : new google.maps.LatLng(-8, 112),
 					</c:otherwise>
@@ -66,33 +63,11 @@
 					
 				zoom : 6
 			};
-			var map = new google.maps.Map(
+			map = new google.maps.Map(
 					document.getElementById("map-canvas"), mapOptions);
 
-			var infowindow = new google.maps.InfoWindow();
-
-			var marker, i;
-
-			for (i = 0; i < markerInfo.length; i++) {
-				marker = new google.maps.Marker({
-					position : new google.maps.LatLng(markerInfo[i][0],
-							markerInfo[i][1]),
-					map : map,
-					title: markerInfo[i][2],
-					id: markerInfo[i][3]
-				});
-
-				marker.addListener('click', function() {
-					window.location.href = '<spring:url value="/places/view-place-"/>'.concat(this.id);
-				  });				
-
-				// add an event listener for this marker
-				bindInfoWindow(marker, map, infowindow, "<b>" + markerInfo[i][2] + "</b><br/><p>"+markerInfo[i][4]+"</p>"); 				
-				
-				marker.addListener('mouseout', function() {
-				    infowindow.close();
-				});				
-			}
+			filterAjax();
+			
 		}
 
 		function bindInfoWindow(marker, map, infowindow, html) { 
@@ -106,7 +81,7 @@
 	</script>
 
 	<script type="text/javascript">
-
+		
 		function isConstrained() {
 			return $(".sidebar").width() == $(window).width();
 		}
@@ -139,6 +114,56 @@
 		});
 	</script>
 	
+	<script>
+	
+	function display(data) {
+		
+		removeMarkers();
+		
+		markers = new Array();
+		
+		for (i = 0; i < data.length; i++) {
+		    var myLatlng = new google.maps.LatLng(data[i].lat, data[i].lon);
+		    var marker = new google.maps.Marker({
+		        position: myLatlng,
+		        map: map,
+		        title: data[i].title,
+		        id: data[i].id
+		    });
+
+		    marker.addListener('click', function() {
+				window.location.href = '<spring:url value="/places/view-place-"/>'.concat(marker.id);
+			});				
+
+		    var infowindow = new google.maps.InfoWindow();
+			// add an event listener for this marker
+			bindInfoWindow(marker, map, infowindow, "<b>" + data[i].title + "</b><br/><p>"+data[i].placeTypes.toString().toLowerCase()+"</p>"); 				
+			
+			marker.addListener('mouseout', function() {
+			    infowindow.close();
+			});		
+		    
+		    markers.push(marker);
+		}		
+	}
+	
+	function removeMarkers() {
+
+	    for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+	    }
+	}	
+	
+	function display2(data) {
+		for( i = 0; i < data.length; i++ ) {
+			console.log(data[i].title);
+			console.log(data[i].lat);
+			console.log(data[i].lon);
+			console.log(data[i].placeTypes);
+        }
+	}
+	
+	</script>
 
 
 

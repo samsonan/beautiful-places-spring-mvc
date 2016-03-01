@@ -69,6 +69,14 @@
 								<form:errors path="password" cssClass="text-danger"/>
 							</div>
 						</div>
+						<div class="form-group">
+							<label for="password" class="col-md-3 control-label">Confirm password</label>
+							<div class="col-md-9">
+								<form:input type="password" class="form-control" name="confirmPassword" path="confirmPassword"
+									placeholder="Confirm Password"/>
+								<form:errors path="confirmPassword" cssClass="text-danger"/>
+							</div>
+						</div>
 
 						<div class="form-group">
 							<!-- Button -->

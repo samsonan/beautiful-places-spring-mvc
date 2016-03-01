@@ -12,10 +12,13 @@ public interface UserService {
     
 	User findById(int id);
 	User findByName(String name);
+	User findByEmail(String email);
 	
     void saveUser(User user);
      
     void deleteById(int id);
+    
+    public void restoreUserPassword(User user);
     
 	
 }

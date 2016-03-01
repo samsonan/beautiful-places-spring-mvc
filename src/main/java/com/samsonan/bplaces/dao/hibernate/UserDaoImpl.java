@@ -15,7 +15,7 @@ public class UserDaoImpl extends AbstractDao<Serializable, User> implements User
 
 	public void saveOrUpdate(User user) {
 		
-		if (findById(user.getId()) != null) {
+		if (user.getId() != null && findById(user.getId()) != null) {
 			merge(user);
 		} else {
 			persist(user);

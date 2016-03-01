@@ -117,11 +117,20 @@ public class PlaceController {
 
 	@RequestMapping(value = {"/places","/places/list"}, method = RequestMethod.GET)
 	public String listPlaces(Model model) {
-
 		resetFilters(model);
-
 		return "places/place_list";
 	}
+
+	@RequestMapping(value = {"/places","/places/list"}, method = RequestMethod.POST)
+	public String applyListPlacesFilter(@ModelAttribute("filters") PlaceFilters filters, 
+			Model model) {
+		
+		Set<Place> set = placeService.findAll(filters);
+		model.addAttribute("placeList", set);
+		
+		return "places/place_list";
+	}
+	
 	
     @RequestMapping(value = { "/places/add" }, method = RequestMethod.GET)
     public String newPlace(ModelMap model) {
@@ -220,6 +229,8 @@ public class PlaceController {
 	@RequestMapping(value = "/api/getFilterResult", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public Set<Place> getSearchResultViaAjax(@RequestBody PlaceFilters filters) {
 
+		logger.debug("filter values: {0}",filters);
+    	
     	Set<Place> result = placeService.findAll(filters);
 		//result will be converted into json format and send back to the request.
 		return result;

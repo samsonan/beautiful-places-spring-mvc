@@ -3,6 +3,7 @@ package com.samsonan.bplaces.web;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.samsonan.bplaces.model.User;
 import com.samsonan.bplaces.service.UserService;
-import com.samsonan.bplaces.service.impl.MailService;
 import com.samsonan.bplaces.util.validation.UserFormValidator;
 
 
@@ -35,9 +35,6 @@ public class UserController {
 	
 	@Autowired
 	UserService userService;
-
-	@Autowired
-	MailService mailService;
 	
 	@Autowired
 	UserFormValidator userFormValidator;
@@ -52,13 +49,42 @@ public class UserController {
 		return "users/login";
 	}
 
+	/**
+	 * Registration 
+	 **/
+	
 	@RequestMapping(value = {"/register"}, method = RequestMethod.GET)
 	public String register(ModelMap model) {
+	
         User user = new User();
         model.addAttribute("user", user);
 		return "users/register";
 	}	
 
+	@RequestMapping(value = {"/register"}, method = RequestMethod.POST)
+	public String register(@ModelAttribute("user") @Valid User userInfo, 
+			  BindingResult result, HttpServletRequest request, HttpServletResponse response) {
+		
+    	if (result.hasErrors()) {
+            return "users/register";
+        }
+ 
+    	userInfo.setRole(User.ROLE_USER);
+    	
+   		userService.registerNewUser(userInfo);
+   		
+   		
+   		try{
+   	   		request.login(userInfo.getName(), userInfo.getPassword());
+   		}catch (Exception ex) {
+   			//automatic login failed? not a big deal
+   			logger.error("Automatic login after registration for user "+userInfo.getName()+" failed",ex);
+   		}
+ 
+		return "redirect:map";
+	}	
+	
+	
 	@RequestMapping(value = {"/restore"}, method = RequestMethod.GET)
 	public String restore(ModelMap model) {
 		return "users/user_restore";
@@ -70,39 +96,35 @@ public class UserController {
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         
-        //TODO: check email and username 
-        //TODO: generate temp pass
+        User user = null;
         
-        try{
-        	mailService.sendMail("andreynsamsonov@gmail.com", "andreynsamsonov@gmail.com", "test", "test. your input: name="+username+"; email="+email);
-        }catch(Exception e){
-        	redirectAttributes.addFlashAttribute("css", "error");
-    		redirectAttributes.addFlashAttribute("msg", "Error sending the message! Please contact support");
-            return "redirect:/login";
+        if (!username.isEmpty()) {
+        	user = userService.findByName(username);
+        	if (user == null) {
+                redirectAttributes.addFlashAttribute("css", "danger");
+        		redirectAttributes.addFlashAttribute("msg", "User "+username+" not found!");
+        		return "redirect:restore";
+        	}
+        } else if (!email.isEmpty()) {
+        	user = userService.findByEmail(email);
+        	if (user == null) {
+                redirectAttributes.addFlashAttribute("css", "danger");
+        		redirectAttributes.addFlashAttribute("msg", "User with email "+email+" not found!");
+        		return "redirect:restore";
+        	}
+        } else {
+            redirectAttributes.addFlashAttribute("css", "danger");
+    		redirectAttributes.addFlashAttribute("msg", "Please specify either username or email");
+    		return "redirect:restore";
         }
-    	redirectAttributes.addFlashAttribute("css", "success");
+        
+        userService.restoreUserPassword(user);
+        
+        redirectAttributes.addFlashAttribute("css", "success");
 		redirectAttributes.addFlashAttribute("msg", "Message has been sent!");
-        
-        return "redirect:users/login";
+				
+        return "redirect:restore";
     }
-	
-	@RequestMapping(value = {"/register"}, method = RequestMethod.POST)
-	public String register(@ModelAttribute("user") @Valid User userInfo, 
-			  BindingResult result) {
-		
-    	if (result.hasErrors()) {
-            return "users/register";
-        }
- 
-    	try{
-    		//TODO: check for existance
-    		userService.registerNewUser(userInfo);
-    	}catch(Exception ex){
-    		logger.error("Error registering user", ex);
-    	}
- 
-		return "redirect:map";
-	}	
 	
 	@RequestMapping(value = {"/users","/users/list"}, method = RequestMethod.GET)
 	public String listUsers(ModelMap model) {

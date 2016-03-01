@@ -24,6 +24,14 @@ public class UserFormValidator implements Validator {
 
 		User user = (User) target;
 		
+		if (userService.findByName(user.getName()) != null) {
+			errors.rejectValue("name", "Exists.user.name");
+		}
+
+		if (userService.findByEmail(user.getEmail()) != null) {
+			errors.rejectValue("email", "Exists.user.email");
+		}
+		
 		if (!user.getPassword().equals(user.getConfirmPassword())) {
 			errors.rejectValue("confirmPassword", "Diff.userform.confirmPassword");
 		}

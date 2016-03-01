@@ -16,6 +16,13 @@
 
 				<div style="padding-top: 20px" class="panel-body">
 
+					<c:if test="${not empty msg}">
+						<div class="alert alert-${css} alert-dismissible" role="alert">
+							<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+							${msg}
+						</div>
+					</c:if>
+
 					<div style="display: none" id="login-alert"
 						class="alert alert-danger col-sm-12"></div>
 
