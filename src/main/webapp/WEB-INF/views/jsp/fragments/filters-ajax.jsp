@@ -43,7 +43,7 @@
 	</c:if>
 
 	<div class="checkbox">
-		<label><form:checkbox path="unesco" value="UNESCO"/>Show UNESCO
+		<label><input type="checkbox" name="unesco" id="unesco" value="UNESCO"/>Show UNESCO
 			sites only</label>
 	</div>
 	<hr />
@@ -55,7 +55,7 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">
-					<form:checkbox path="nature" class="checkNature" id="checkNatureAll"
+					<input type="checkbox" name="nature" class="checkNature" id="checkNatureAll"
 						value="" /> <a data-toggle="collapse" href="#collapse_nat">
 						Natural Places <i class="fa fa-chevron-down pull-right"></i></a>
 				</h4>
@@ -63,23 +63,23 @@
 			<div id="collapse_nat" class="panel-collapse collapse">
 				<div class="panel-body">
 					<div class="checkbox">
-						<label><form:checkbox path="naturalTypes"
+						<label><input type="checkbox" name="naturalTypes[]"
 								class="checkNature" value="BEACH" />Beach</label>
 					</div>
 					<div class="checkbox">
-						<label><form:checkbox path="naturalTypes"
+						<label><input type="checkbox" name="naturalTypes[]"
 								class="checkNature" value="LAKE" />Lake</label>
 					</div>
 					<div class="checkbox">
-						<label><form:checkbox path="naturalTypes"
+						<label><input type="checkbox" name="naturalTypes[]"
 								class="checkNature" value="MOUNT" />Mountain</label>
 					</div>
 					<div class="checkbox">
-						<label><form:checkbox path="naturalTypes"
+						<label><input type="checkbox" name="naturalTypes[]"
 								class="checkNature" value="RIVER" />River</label>
 					</div>
 					<div class="checkbox">
-						<label><form:checkbox path="naturalTypes"
+						<label><input type="checkbox" name="naturalTypes[]"
 								class="checkNature" value="VOLC" />Volcano</label>
 					</div>
 				</div>
@@ -91,7 +91,7 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">
-					<form:checkbox path="culture" class="checkCulture" id="checkCultureAll"
+					<input type="checkbox" name="culture" class="checkCulture" id="checkCultureAll"
 						value="" /> <a data-toggle="collapse" href="#collapse_cult">
 						Cultural Places <i class="fa fa-chevron-down pull-right"></i></a>
 				</h4>
@@ -99,11 +99,11 @@
 			<div id="collapse_cult" class="panel-collapse collapse">
 				<div class="panel-body">
 					<div class="checkbox">
-						<label><form:checkbox path="culturalTypes" class="checkCulture"
+						<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
 							value="TEMPLE"/>Temple</label>
 					</div>
 					<div class="checkbox">
-						<label><form:checkbox path="culturalTypes" class="checkCulture"
+						<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
 							value="VILLAGE"/>Village</label>
 					</div>
 				</div>
@@ -115,7 +115,7 @@
 
 	<div class="btn-group" style="margin-top: 20px">
 		<button type="submit" id="btn-filter-apply" class="btn btn-primary"  name="filter.apply">Apply</button>
-		<button class="btn btn-default" name="filter.reset">Reset</button>
+		<button type="button" id="btn-filter-reset" class="btn btn-default" name="filter.reset">Reset</button>
 		<!-- button class="btn btn-default" name="filter.save">Save</button-->
 	</div>
 
@@ -125,9 +125,12 @@
 <script>
 	jQuery(document).ready(function($) {
 
+		$(".checkNature").prop('checked', true);
+		$(".checkCulture").prop('checked', true);
+		
 		$("#filter-form").submit(function(event) {
 
-			// Disble the search button
+			// Disble the filter button
 			enableFilterButton(false);
 	
 			// Prevent the form from submitting via the browser.
@@ -141,9 +144,24 @@
 	
 	function filterAjax() {
 
-		var search = {}
-		search["naturalTypes"] = $("#naturalTypes").val();
-		search["culturalTypes"] = $("#culturalTypes").val();
+		var filter = {}
+		
+		var values = new Array();
+		$.each($("input[name='naturalTypes[]']:checked"), function() {
+		  values.push($(this).val());
+		});
+		
+		filter["naturalTypes"] = values;
+
+		values = new Array();
+		$.each($("input[name='culturalTypes[]']:checked"), function() {
+			  values.push($(this).val());
+		});
+		
+		filter["culturalTypes"] = values;
+		
+		if($("#unesco").is(':checked'))
+			filter["unesco"] = true; 
 		
 		$.ajax({
 			type : "POST",
@@ -153,7 +171,7 @@
             },
 			contentType : "application/json",
 			url : "${home}/api/getFilterResult",
-			data : JSON.stringify(search),
+			data : JSON.stringify(filter),
 			dataType : 'json',
 			timeout : 100000,
 			success : function(data) {
@@ -176,8 +194,12 @@
 		$("#btn-filter-apply").prop("disabled", flag);
 	}
 	
-	function display(data) {
-	}
+	$('#btn-filter-reset').click(function(){
+		$("#unesco").prop('checked', false);
+		$(".checkNature").prop('checked', true);
+		$(".checkCulture").prop('checked', true);
+	});
+
 </script>
 	
 <script>
