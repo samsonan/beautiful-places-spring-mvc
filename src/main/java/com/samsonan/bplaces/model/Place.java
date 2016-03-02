@@ -21,6 +21,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -73,8 +75,8 @@ public class Place {
 	@Column(name="updated")
 	private Date updated;
 
-	@Column(name="country")
-    private String country; //TODO: location/code 
+	@Column(name="location")
+    private Integer location; 
 
 	@ManyToOne
 	@JoinColumn(name="created_by")
@@ -99,6 +101,27 @@ public class Place {
 	@JsonIgnore 
 	private Set<Image> placeImages = new HashSet<Image>();
 	
+	@Transient
+	private String zone;
+	@Transient
+	private String country;
+	
+	public String getZone() {
+		return zone;
+	}
+
+	public void setZone(String zone) {
+		this.zone = zone;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
 	public Place(){
 	}
 	
@@ -219,12 +242,12 @@ public class Place {
 		this.updated = updated;
 	}
 
-	public String getCountry() {
-		return country;
+	public Integer getLocation() {
+		return location;
 	}
 
-	public void setCountry(String country) {
-		this.country = country;
+	public void setLocation(Integer location) {
+		this.location = location;
 	}	
 	
 	public String getLocationPath(){

@@ -19,6 +19,9 @@
 	<!-- Custom project CSS -->
 	<link href="${mainCss}" rel="stylesheet" />
 	
+	<spring:url value="/resources/core/css/bootstrap3-wysihtml5.min.css" var="wysiwygCss" />
+	<link href="${wysiwygCss}" rel="stylesheet" />
+	
 	<c:url value="/logout" var="logoutUrl" />
 	<!-- csrt support -->
 	<form action="${logoutUrl}" method="post" id="logoutForm">

@@ -85,9 +85,11 @@
 						<div class="form-group">
 							<label class="control-label col-sm-2" for="location">Location:</label>
 							<div class="col-sm-10">
-								<form:select class="form-control" id="country" path="country">
-									<option>Select Country</option>
-									<form:options items="${countryList}" itemValue="code" itemLabel="name"/>
+								<form:select class="form-control" id="zone" items="${zones}" path="zone" style="margin-bottom:5px;">
+								</form:select>
+								<form:select class="form-control" id="country" items="${countries}" path="country" style="margin-bottom:5px;">
+								</form:select>
+								<form:select class="form-control" id="location" items="${locations}" path="location">
 								</form:select>
 							</div>
 						</div>
@@ -140,7 +142,7 @@
 
 								        <td><form:input path="placeLinks[${idx.index}].siteName" value="${link.siteName}" type="text" class="form-control" id="site_name" placeholder="Site Name"/></td>
 								        <td><form:input path="placeLinks[${idx.index}].url" value="${link.url}" type="text" class="form-control" id="site_url" placeholder="Site URL" /></td>
-								        <td><button type="button" class="btn btn-danger delLinkBtn" onclick="deleteRow(this)" value="Delete" ></button></td>
+								        <td><button type="button" class="btn btn-danger delLinkBtn" onclick="deleteRow(this)" value="Delete" >Delete</button></td>
 								
 								      </tr>
 								</c:forEach>
@@ -149,7 +151,7 @@
 								      <tr>
 								        <td><input name="placeLinks[<c:out value="${last_idx}" />].siteName" type="text" class="form-control" id="site_name" placeholder="Site Name"/></td>
 								        <td><input name="placeLinks[<c:out value="${last_idx}" />].url" type="text" class="form-control"	id="site_url" placeholder="Site URL" /></td>
-								        <td><button type="button" class="btn btn-danger delLinkBtn" onclick="deleteRow(this)" value="Delete" ></button></td>
+								        <td><button type="button" class="btn btn-danger delLinkBtn" onclick="deleteRow(this)" value="Delete" >Delete</button></td>
 								      </tr>
 								      	
 
@@ -180,6 +182,78 @@
 
 			</div>
 		</div> <!-- container-fluid -->
+
+		<script>
+		
+		console.log('location:'+$('#location').val);
+		
+		//requestDDValues(null, "zone");
+		
+		$('#zone').change(
+			    function() {
+			        var sel_zone = $('#zone option:selected').val();
+			        $("#location").find('option').remove();   
+			        requestDDValues(sel_zone, "country");
+			    }
+			);
+
+		$('#country').change(
+			    function() {
+			        var sel_country = $('#country option:selected').val();
+			        requestDDValues(sel_country, "location");
+			    }
+			);
+		
+		
+		function requestDDValues(key, request_table) {
+
+			var filter = {}
+			
+			if (key != null)
+				filter["key"] = key;
+			
+			filter["reqTableName"] = request_table; 
+			
+			$.ajax({
+				type : "POST",
+				beforeSend: function (request)
+	            {
+	                request.setRequestHeader("X-CSRF-TOKEN", "${_csrf.token}");
+	            },
+				contentType : "application/json",
+				url : "${home}/api/getLocationList",
+				data : JSON.stringify(filter),
+				dataType : 'json',
+				timeout : 100000,
+				success : function(data) {
+					console.log("SUCCESS: ", data);
+					display(data);
+				},
+				error : function(e) {
+					console.log("ERROR: ", e);
+				},
+				done : function(e) {
+					console.log("DONE");
+				}
+			});
+		
+		}		
+		
+		function display(data){
+			
+			if (data.tableName == "zone" || data.tableName == "country" || data.tableName == "location") {
+				var $select = $("#"+data.tableName);
+				$select.find('option').remove();   
+				$select.append($("<option />").val("0").text("Select "+data.tableName));  
+				$.each(data.locationMap, function(key, value) {
+					$select.append($("<option />").val(key).text(value));
+				});
+			} 
+			
+		}
+		
+		
+		</script>
 
 		<script>
 		
@@ -235,11 +309,13 @@
 	</script>		
 		
 	<script>
-  		$('#description').wysihtml5({
-    		toolbar: {
-      		fa: true
-    		}
-  		});
+		$(function() {
+  			$('#description').wysihtml5({
+    			toolbar: {
+      			fa: true
+    			}
+  			});
+		});
 	</script>
 
 	<jsp:include page="../fragments/footer.jsp" />

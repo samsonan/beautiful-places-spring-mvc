@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,12 +28,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.samsonan.bplaces.dao.LocationDao;
-import com.samsonan.bplaces.model.Country;
+import com.samsonan.bplaces.model.LocationRequest;
+import com.samsonan.bplaces.model.LocationResponse;
 import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.model.PlaceFilters;
 import com.samsonan.bplaces.model.PlaceLink;
 import com.samsonan.bplaces.service.PlaceService;
 import com.samsonan.bplaces.util.validation.PlaceFormValidator;
+import com.sun.javafx.scene.layout.region.SliceSequenceConverter;
 
 @Controller
 public class PlaceController {
@@ -137,6 +139,10 @@ public class PlaceController {
         
     	Place place = new Place();
         model.addAttribute("place", place);
+        
+        Map<String, String> zones = locationDao.findAllZones();
+		model.addAttribute("zones", zones);        
+        
         return "places/place_edit";
     }	
 
@@ -144,7 +150,24 @@ public class PlaceController {
     public String editPlace(@PathVariable int id, ModelMap model) {
     	
     	Place place = placeService.findById(id);
-        model.addAttribute("place", place);
+
+    	String selectedCountry = locationDao.findCountryByLocation(place.getLocation());
+		String selectedZone = locationDao.findZoneByLocation(place.getLocation());
+    	
+		place.setCountry(selectedCountry);
+		place.setZone(selectedZone);
+
+		model.addAttribute("place", place);
+        
+        Map<String, String> zones = locationDao.findAllZones();
+		model.addAttribute("zones", zones);        
+        
+        Map<String, String> countries = locationDao.findAllCountriesForZone(selectedZone);
+		model.addAttribute("countries", countries);        
+
+        Map<String, String> locations = locationDao.findAllLocationsForCountry(selectedCountry);
+		model.addAttribute("locations", locations);        
+		
         return "places/place_edit";
     }	
 
@@ -215,26 +238,39 @@ public class PlaceController {
     @RequestMapping(value = { "/places/add","/places/edit-place-{id}", "/upload" }, params = "edit.cancel")
     public String cancelEdit() {
 
-        return "redirect:places/list";
+        return "redirect:list";
     }    
-    
-    @ModelAttribute("countryList")
-    public List<Country> countryList(){
-
-        return locationDao.findAllCountries();
-    }	
-    
     
     @ResponseBody
 	@RequestMapping(value = "/api/getFilterResult", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public Set<Place> getSearchResultViaAjax(@RequestBody PlaceFilters filters) {
+	public Set<Place> getFilteredResultsViaAjax(@RequestBody PlaceFilters filters) {
 
 		logger.debug("filter values: {0}",filters);
     	
     	Set<Place> result = placeService.findAll(filters);
-		//result will be converted into json format and send back to the request.
 		return result;
 	}
-	
+
+    @ResponseBody
+	@RequestMapping(value = "/api/getLocationList", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public LocationResponse getLocationListViaAjax(@RequestBody LocationRequest locationRequest) {
+
+		logger.debug("location request: {0}", locationRequest);
+    	
+		LocationResponse locationResponse = new LocationResponse();
+		
+		locationResponse.setTableName(locationRequest.getReqTableName());
+		
+		if (locationRequest.getReqTableName().equals("zone"))
+			locationResponse.setLocationMap(locationDao.findAllZones());
+		else if (locationRequest.getReqTableName().equals("country"))
+			locationResponse.setLocationMap(locationDao.findAllCountriesForZone(locationRequest.getKey()));
+		else if (locationRequest.getReqTableName().equals("location"))
+			locationResponse.setLocationMap(locationDao.findAllLocationsForCountry(locationRequest.getKey()));
+		
+		return locationResponse;
+	}
+    
+    
 	
 }

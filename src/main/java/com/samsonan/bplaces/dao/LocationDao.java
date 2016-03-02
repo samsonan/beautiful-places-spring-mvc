@@ -1,12 +1,14 @@
 package com.samsonan.bplaces.dao;
 
-import java.util.List;
-import com.samsonan.bplaces.model.Country;
+import java.util.Map;
 
 public interface LocationDao {
 
-	Country findCountryByCode(String countryCode) throws Exception;
+	String findCountryByLocation(Integer location);
+	String findZoneByLocation(Integer location);
 
-	List<Country> findAllCountries();
+	Map<String, String> findAllZones();
+	Map<String, String> findAllCountriesForZone(String zone);
+	Map<String, String> findAllLocationsForCountry(String country);
 
 }
