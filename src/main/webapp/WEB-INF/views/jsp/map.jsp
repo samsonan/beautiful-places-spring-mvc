@@ -6,42 +6,45 @@
 
 <jsp:include page="fragments/header.jsp" />
 
-<spring:url value="/resources/core/css/map.css" var="mapCss" />
+<spring:url value="/resources/core/css/gmaps-sidebar.css" var="mapCss" />
 <link href="${mapCss}" rel="stylesheet" />
 
-		<div class="navbar-offset"></div>
+    <div id="sidebar" class="sidebar collapsed">
+        <!-- Nav tabs -->
+        <div class="sidebar-tabs">
+            <ul role="tablist">
+                <li><a href="#filter" role="tab"><i class="fa fa-filter"></i></a></li>
+                <li><a href="#info" role="tab"><i class="fa fa-info"></i></a></li>
+            </ul>
+        </div>
+
+        <!-- Tab panes -->
+        <div class="sidebar-content">
+            <div class="sidebar-pane" id="filter">
+                <h1 class="sidebar-header">
+                    Filters
+                    <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h1>
+
+                <p></p>
+
+				<jsp:include page="fragments/filters-ajax.jsp" >
+					<jsp:param name="is_search" value="false" />
+					<jsp:param name="is_location" value="false" />
+				</jsp:include>
+            </div>
+
+            <div class="sidebar-pane" id="info">
+                <h1 class="sidebar-header">Place Info<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+                <p></p>
+                <div id="placeInfoContent"><p>Select any place on the map!</p></div>
+            </div>
+
+        </div>
+    </div>
+
 		<div id="map-canvas">
 			<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-		</div>
-		<div class="row main-row" >
-			<div class="col-sm-4 col-md-2 sidebar sidebar-left pull-left">
-
-				<div class="panel-group sidebar-body" id="accordion-left">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" href="#layers"> <i
-									class="fa fa-list-alt"></i> Filters
-								</a> <span class="pull-right slide-submenu"> <i
-									class="fa fa-chevron-left"></i> hide
-								</span>
-							</h4>
-						</div>
-						<div id="layers" class="panel-collapse collapse in">
-							<div class="panel-body" id="main-panel-body">
-								<jsp:include page="fragments/filters-ajax.jsp" >
-									<jsp:param name="is_search" value="false" />
-									<jsp:param name="is_location" value="false" />
-								</jsp:include>
-
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="mini-submenu mini-submenu-left pull-left">
-			<i class="fa fa-list-alt"></i>
 		</div>
 
 	<script>
@@ -80,43 +83,43 @@
 		google.maps.event.addDomListener(window, 'load', initialize);
 	</script>
 
-	<script type="text/javascript">
 		
-		function isConstrained() {
-			return $(".sidebar").width() == $(window).width();
-		}
-
-		function applyInitialUIState() {
-			if (isConstrained()) {
-				$(".sidebar-left .sidebar-body").fadeOut('slide');
-				$('.mini-submenu-left').fadeIn();
-			}
-		}
-
-		$(function() {
-			$('.sidebar-left .slide-submenu').on('click', function() {
-				var thisEl = $(this);
-				thisEl.closest('.sidebar-body').fadeOut('slide', function() {
-					$('.mini-submenu-left').fadeIn();
-					
-				});
-			});
-
-			$('.mini-submenu-left').on('click', function() {
-				var thisEl = $(this);
-				$('.sidebar-left .sidebar-body').toggle('slide');
-				thisEl.hide();
-				
-			});
-
-			applyInitialUIState();
-			
-		});
-	</script>
-	
 	<script>
+
+	function requestPlaceInfoAjax(placeId) {
+		
+		console.log("requesting info for place id="+placeId);
+
+		var search = {}
+		
+		search["placeId"] = placeId; 
+		
+		$.ajax({
+			type : "GET",
+			beforeSend: function (request)
+            {
+                request.setRequestHeader("X-CSRF-TOKEN", "${_csrf.token}");
+            },
+			contentType : "application/json",
+			url : "${home}/api/places/"+placeId,
+			data : JSON.stringify(search),
+			dataType : 'json',
+			timeout : 100000,
+			success : function(data) {
+				console.log("SUCCESS: ", data);
+				displayPlaceInfo(data);
+			},
+			error : function(e) {
+				console.log("ERROR: ", e);
+			},
+			done : function(e) {
+				console.log("DONE");
+			}
+		});
 	
-	function display(data) {
+	}	
+	
+	function displayMarkers(data) {
 		
 		removeMarkers();
 		
@@ -132,16 +135,26 @@
 		    });
 
 		    marker.addListener('click', function() {
-				window.location.href = '<spring:url value="/places/view-place-"/>'.concat(marker.id);
+		    	requestPlaceInfoAjax(marker.id);
+				sidebar.open('info', null);
 			});				
 
 		    var infowindow = new google.maps.InfoWindow();
-			// add an event listener for this marker
-			bindInfoWindow(marker, map, infowindow, "<b>" + data[i].title + "</b><br/><p>"+data[i].placeTypes.toString().toLowerCase()+"</p>"); 				
+
+			var content = "<b>" + data[i].title + "</b><br/><p>"+data[i].placeTypes.toString().toLowerCase()+"</p>";
 			
-			marker.addListener('mouseout', function() {
-			    infowindow.close();
-			});		
+			 google.maps.event.addListener(marker, 'mouseover', (function (marker, content, infowindow) {
+		            return function () {
+		                infowindow.setContent(content);
+		                infowindow.open(map, marker);
+		            };
+		        })(marker, content, infowindow));
+		        google.maps.event.addListener(marker, 'mouseout', (function (marker, content, infowindow) {
+		            return function () {
+		                infowindow.close();
+		            };
+		        })(marker, content, infowindow));			
+			
 		    
 		    markers.push(marker);
 		}		
@@ -154,13 +167,19 @@
 	    }
 	}	
 	
-	function display2(data) {
-		for( i = 0; i < data.length; i++ ) {
-			console.log(data[i].title);
-			console.log(data[i].lat);
-			console.log(data[i].lon);
-			console.log(data[i].placeTypes);
-        }
+	function displayPlaceInfo(data) {
+
+		<spring:url value="/places/view-place-" var="viewUrl" />
+		
+		var content = "<h3><a href='${viewUrl}"+data.id+"'>"+data.title+"</a></h3>"+
+        	"<hr/>"+
+        	"<p><span class='label label-default'>"+data.placeTypes+"</span></p>"+
+        	"<img src='http://griyasari.com/wp-content/uploads/2013/10/borobudur44.jpg' width='330' class='img-thumbnail' />"+
+        	"<br/><br/>"+
+        	"<p>"+data.description+"</p>"+
+        	"<a href='${viewUrl}"+data.id+"' class='btn btn-default'>More!...</a>";
+		
+		$("#placeInfoContent").html ( content );
 	}
 	
 	</script>
@@ -169,5 +188,14 @@
 
 	<jsp:include page="fragments/footer.jsp" />
 
+	<spring:url value="/resources/core/js/plugins/jquery-sidebar.js" var="sidebarJs"/>
+
+	<script src="${sidebarJs}"></script>
+	<script>
+
+	var sidebar = $('#sidebar').sidebar();
+	
+	</script>
+	
 </body>
 </html>

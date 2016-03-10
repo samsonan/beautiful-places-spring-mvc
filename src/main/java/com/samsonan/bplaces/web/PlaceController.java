@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.samsonan.bplaces.dao.LocationDao;
+import com.samsonan.bplaces.model.LocationDetails;
 import com.samsonan.bplaces.model.LocationRequest;
 import com.samsonan.bplaces.model.LocationResponse;
 import com.samsonan.bplaces.model.Place;
@@ -35,7 +36,6 @@ import com.samsonan.bplaces.model.PlaceFilters;
 import com.samsonan.bplaces.model.PlaceLink;
 import com.samsonan.bplaces.service.PlaceService;
 import com.samsonan.bplaces.util.validation.PlaceFormValidator;
-import com.sun.javafx.scene.layout.region.SliceSequenceConverter;
 
 @Controller
 public class PlaceController {
@@ -70,24 +70,6 @@ public class PlaceController {
 		return resetFilters(model);
 	}
 
-	@RequestMapping(value = {"/", "/map"}, params = "filter.apply", method = RequestMethod.POST)
-	public String mapApplyFilter(@ModelAttribute("filters") PlaceFilters filters, 
-			Model model) {
-		
-		Set<Place> set = placeService.findAll(filters);
-		model.addAttribute("filters", filters);
-		model.addAttribute("placeList", set);
- 
-		return "map";
-	}		
-
-	@RequestMapping(value = {"/", "/map"}, params = "filter.reset", method = RequestMethod.POST)
-	public String mapResetFilters(@ModelAttribute("filters") PlaceFilters filters, 
-			Model model) {
-		
-		return resetFilters(model);
-	}		
-
 	private String resetFilters(Model model) {
 		Set<Place> set = placeService.findAll();
 		model.addAttribute("filters", new PlaceFilters());
@@ -119,7 +101,18 @@ public class PlaceController {
 
 	@RequestMapping(value = {"/places","/places/list"}, method = RequestMethod.GET)
 	public String listPlaces(Model model) {
-		resetFilters(model);
+		
+		Set<Place> set = placeService.findAll();
+		
+		for (Iterator<Place> iterator = set.iterator(); iterator.hasNext();) {
+			Place place = (Place) iterator.next();
+			place.setLocationDetails(locationDao.getLocationDetails(place.getLocation()));
+			
+		}
+		
+		model.addAttribute("filters", new PlaceFilters());
+		model.addAttribute("placeList", set);
+		
 		return "places/place_list";
 	}
 
@@ -151,29 +144,32 @@ public class PlaceController {
     	
     	Place place = placeService.findById(id);
 
-    	String selectedCountry = locationDao.findCountryByLocation(place.getLocation());
-		String selectedZone = locationDao.findZoneByLocation(place.getLocation());
-    	
-		place.setCountry(selectedCountry);
-		place.setZone(selectedZone);
+    	LocationDetails details = locationDao.getLocationDetails(place.getLocation());
 
-		model.addAttribute("place", place);
-        
         Map<String, String> zones = locationDao.findAllZones();
 		model.addAttribute("zones", zones);        
-        
-        Map<String, String> countries = locationDao.findAllCountriesForZone(selectedZone);
-		model.addAttribute("countries", countries);        
+    	
+    	if (details != null) {
+    	
+			place.setLocationDetails(details);
+	        
+	        Map<String, String> countries = locationDao.findAllCountriesForZone(details.getZoneCode());
+			model.addAttribute("countries", countries);        
+	
+	        Map<String, String> locations = locationDao.findAllLocationsForCountry(details.getCountryCode());
+			model.addAttribute("locations", locations);
 
-        Map<String, String> locations = locationDao.findAllLocationsForCountry(selectedCountry);
-		model.addAttribute("locations", locations);        
-		
-        return "places/place_edit";
+    	} 
+    	
+		model.addAttribute("place", place);
+
+    	return "places/place_edit";
     }	
 
     @RequestMapping(value = { "/places/view-place-{id}" }, method = RequestMethod.GET)
     public String viewPlace(@PathVariable int id, ModelMap model) {
         Place place = placeService.findById(id);
+        place.setLocationDetails(locationDao.getLocationDetails(place.getLocation()));
         model.addAttribute("place", place);
         return "places/place_view";
     }    
@@ -270,7 +266,18 @@ public class PlaceController {
 		
 		return locationResponse;
 	}
+
     
+    @ResponseBody
+	@RequestMapping(value = "/api/places/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public Place getPlaceInfoViaAjax(@PathVariable int id) {
+
+    	 Place place = placeService.findById(id);
+    	 
+    	 return place;
+         
+	}
     
+
 	
 }

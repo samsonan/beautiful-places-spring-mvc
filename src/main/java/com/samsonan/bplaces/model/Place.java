@@ -100,31 +100,13 @@ public class Place {
 	@OneToMany(mappedBy="place", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = false)
 	@JsonIgnore 
 	private Set<Image> placeImages = new HashSet<Image>();
-	
+
 	@Transient
-	private String zone;
-	@Transient
-	private String country;
+	private LocationDetails locationDetails;
 	
-	public String getZone() {
-		return zone;
-	}
-
-	public void setZone(String zone) {
-		this.zone = zone;
-	}
-
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
-	}
-
 	public Place(){
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -246,13 +228,22 @@ public class Place {
 		return location;
 	}
 
+	public String getZone(){
+		if (locationDetails != null)
+			return locationDetails.getZoneCode();
+		else return null;
+	}
+
+	public String getCountry(){
+		if (locationDetails != null)
+			return locationDetails.getCountryCode();
+		else return null;
+	}
+	
+	
 	public void setLocation(Integer location) {
 		this.location = location;
 	}	
-	
-	public String getLocationPath(){
-		return "China";
-	}
 
 	public User getCreatedBy() {
 		return createdBy;
@@ -270,6 +261,14 @@ public class Place {
 		this.updatedBy = updatedBy;
 	}
 
+	public LocationDetails getLocationDetails() {
+		return locationDetails;
+	}
+
+	public void setLocationDetails(LocationDetails locationDetails) {
+		this.locationDetails = locationDetails;
+	}
+	
 	@Override
     public int hashCode() {
 		return new HashCodeBuilder(19, 39).
@@ -299,7 +298,7 @@ public class Place {
  
     @Override
     public String toString() {
-        return "User [id=" + id + ", title="+title+", description=" + description + ""
+        return "Place [id=" + id + ", title="+title+", description=" + description + ""
         		+ ", lat=" + lat + ", lon=" + lon + ", status=" + status + "]";
     }
     	

@@ -54,7 +54,6 @@ public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements Pl
 		//select * from place p inner join place_type pt on p.id=pt.place_id where pt.type in (N1,N2,N3,C1,C2) 
 		// [and p.unesco = true]
 
-		//holy fuck! i've spent two hours trying to make it work. Just because place types are not entities, but elements!!!!
 		//HQL will look like this! Note that it is not fully compliant with Criteria!!!!
 		//Query query = getSession().createQuery("from Place p inner join p.placeTypes pt where pt in ('VILLAGE') ");
 		

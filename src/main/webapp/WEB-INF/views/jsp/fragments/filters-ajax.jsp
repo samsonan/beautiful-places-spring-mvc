@@ -48,66 +48,92 @@
 	</div>
 	<hr />
 	<div>
-		<h5>Place type:</h5>
+		
 	</div>
 
 	<div class="panel-group">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h4 class="panel-title">
-					<input type="checkbox" name="nature" class="checkNature" id="checkNatureAll"
-						value="" /> <a data-toggle="collapse" href="#collapse_nat">
-						Natural Places <i class="fa fa-chevron-down pull-right"></i></a>
+				<h4 class="panel-title filter-panel-title">
+						Natural Places 
 				</h4>
 			</div>
-			<div id="collapse_nat" class="panel-collapse collapse">
 				<div class="panel-body">
 					<div class="checkbox">
-						<label><input type="checkbox" name="naturalTypes[]"
-								class="checkNature" value="BEACH" />Beach</label>
+						<label><input type="checkbox"  name="nature" class="checkNature" id="checkNatureAll"/>Select / Unselect All</label>
+					</div>
+			        <div class="row">
+			            <div class="col-md-6">
+				
+							<div class="checkbox">
+								<label><input type="checkbox" name="naturalTypes[]"
+										class="checkNature" value="BEACH" />Beach</label>
+							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" name="naturalTypes[]"
+										class="checkNature" value="LAKE" />Lake</label>
+							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" name="naturalTypes[]"
+										class="checkNature" value="CAVE" />Cave</label>
+							</div>
+							
+						</div>
+						<div class="col-md-6">
+						
+							<div class="checkbox">
+								<label><input type="checkbox" name="naturalTypes[]"
+										class="checkNature" value="RIVER" />River</label>
+							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" name="naturalTypes[]"
+										class="checkNature" value="VOLC" />Volcano</label>
+							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" name="naturalTypes[]"
+										class="checkNature" value="MOUNT" />Mountain</label>
+							</div>
+						</div>
 					</div>
 					<div class="checkbox">
 						<label><input type="checkbox" name="naturalTypes[]"
-								class="checkNature" value="LAKE" />Lake</label>
+								class="checkNature" value="OTHER" />Other</label>
 					</div>
-					<div class="checkbox">
-						<label><input type="checkbox" name="naturalTypes[]"
-								class="checkNature" value="MOUNT" />Mountain</label>
-					</div>
-					<div class="checkbox">
-						<label><input type="checkbox" name="naturalTypes[]"
-								class="checkNature" value="RIVER" />River</label>
-					</div>
-					<div class="checkbox">
-						<label><input type="checkbox" name="naturalTypes[]"
-								class="checkNature" value="VOLC" />Volcano</label>
-					</div>
+					
 				</div>
-			</div>
 		</div>
 	</div>
 
 	<div class="panel-group">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h4 class="panel-title">
-					<input type="checkbox" name="culture" class="checkCulture" id="checkCultureAll"
-						value="" /> <a data-toggle="collapse" href="#collapse_cult">
-						Cultural Places <i class="fa fa-chevron-down pull-right"></i></a>
+				<h4 class="panel-title filter-panel-title">
+					Cultural Places
 				</h4>
 			</div>
-			<div id="collapse_cult" class="panel-collapse collapse">
 				<div class="panel-body">
 					<div class="checkbox">
-						<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
-							value="TEMPLE"/>Temple</label>
+						<label><input type="checkbox"  name="culture" class="checkCulture" id="checkCultureAll"/>Select / Unselect All</label>
 					</div>
-					<div class="checkbox">
+			        <div class="row">
+			            <div class="col-md-6">
+				            <div class="checkbox">
+							<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
+								value="TEMPLE"/>Temple</label>
+							</div>
+			            </div>
+			            <div class="col-md-6">
+							<div class="checkbox">
+								<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
+									value="VILLAGE"/>Village</label>
+							</div>			            
+						</div>
+			        </div>
+		            <div class="checkbox">
 						<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
-							value="VILLAGE"/>Village</label>
+							value="OTHER"/>Other</label>
 					</div>
 				</div>
-			</div>
 		</div>
 	</div>
 
@@ -176,11 +202,11 @@
 			timeout : 100000,
 			success : function(data) {
 				console.log("SUCCESS: ", data);
-				display(data);
+				displayMarkers(data);
 			},
 			error : function(e) {
 				console.log("ERROR: ", e);
-				display(e);
+				//displayMarkers(e);
 			},
 			done : function(e) {
 				console.log("DONE");

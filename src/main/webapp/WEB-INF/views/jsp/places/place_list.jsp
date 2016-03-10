@@ -32,6 +32,7 @@
 				<c:forEach var="place" items="${placeList}">
 					<spring:url value="/places/view-place-${place.id}" var="viewUrl" />
 					<spring:url value="/places/edit-place-${place.id}" var="updateUrl" />
+					<spring:url value="/places/list" var="baseUrl" />
 					<h2><a href="${viewUrl}">${place.title}</a>
 					
 						<sec:authorize access="isAuthenticated()">
@@ -40,7 +41,10 @@
 						</sec:authorize>
 					</h2>
 					<h5>
-						<span class="glyphicon glyphicon-globe"></span> ${place.country} / ${place.locationPath}
+						<span class="glyphicon glyphicon-globe"></span>
+						<a href="${baseUrl}?zn=${place.locationDetails.zoneCode}">${place.locationDetails.zoneName}</a> / 
+						<a href="${baseUrl}?ccode=${place.locationDetails.countryCode}">${place.locationDetails.countryName}</a> / 
+						<a href="${baseUrl}?locid=${place.locationDetails.locationId}">${place.locationDetails.locationName}</a> 
 					</h5>
 					<h5>
 						<c:if test="${place.unesco}" >

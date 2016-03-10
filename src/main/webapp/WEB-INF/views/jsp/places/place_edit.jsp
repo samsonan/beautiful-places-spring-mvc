@@ -185,7 +185,9 @@
 
 		<script>
 		
-		console.log('location:'+$('#location').val);
+		<c:if test="${empty place.title}">
+			$("#zone").prepend("<option value='0' selected='selected'>Select region</option>");
+		</c:if>
 		
 		//requestDDValues(null, "zone");
 		
@@ -213,6 +215,14 @@
 				filter["key"] = key;
 			
 			filter["reqTableName"] = request_table; 
+			
+			if (key == 0){
+				
+				var $select = $("#"+request_table);
+				$select.find('option').remove();
+				
+				return;
+			}
 			
 			$.ajax({
 				type : "POST",
@@ -243,7 +253,7 @@
 			
 			if (data.tableName == "zone" || data.tableName == "country" || data.tableName == "location") {
 				var $select = $("#"+data.tableName);
-				$select.find('option').remove();   
+				$select.find('option').remove();
 				$select.append($("<option />").val("0").text("Select "+data.tableName));  
 				$.each(data.locationMap, function(key, value) {
 					$select.append($("<option />").val(key).text(value));
