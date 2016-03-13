@@ -29,10 +29,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User registerNewUser(User user) {
         userDao.saveOrUpdate(user);
-        
-        //TODO:
-        //generate unique confirmation ID to your application. e.g. java.util.UUID.randomUUID().toString()
+                
+        //generate unique confirmation ID to your application
+        //String uuid = java.util.UUID.randomUUID().toString();
         //store the ID with the account;
+        
         //Send the URL+ID (http://yourapp.com/confirm?id=UUID) as an email
         //request mapping GET /confirm?id=UUID
         //redirect somewhere

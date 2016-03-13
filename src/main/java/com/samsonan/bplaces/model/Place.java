@@ -21,14 +21,22 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.URL;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * TODO:
+ * http://stackoverflow.com/questions/913025/best-spring-hibernate-configuration-for-never-changing-tables
+ *  
+ * 
+ * 
+ * @author ShamanXXI
+ *
+ */
 
 @Entity
 @Table(name="place")
@@ -37,6 +45,10 @@ public class Place {
 	public final static int STATUS_PENDING = 0; 
 	public final static int STATUS_READY = 1; 
 	public final static int STATUS_PUBLISHED = 2; 
+
+	public final static int CATEGORY_CULTURE = 1; //01
+	public final static int CATEGORY_NATURE = 2;  //10
+	public final static int CATEGORY_MIX = 3;     //11
 	
 	@Id
 	@Column(name="id")
@@ -66,6 +78,9 @@ public class Place {
 	
 	@Column(name="status")
     private int status;  
+
+	@Column(name="category")
+    private int category;  
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created")
@@ -74,9 +89,6 @@ public class Place {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="updated")
 	private Date updated;
-
-	@Column(name="location")
-    private Integer location; 
 
 	@ManyToOne
 	@JoinColumn(name="created_by")
@@ -98,11 +110,17 @@ public class Place {
 	private List<PlaceLink> placeLinks = new ArrayList<PlaceLink>();
 
 	@OneToMany(mappedBy="place", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = false)
-	@JsonIgnore 
 	private Set<Image> placeImages = new HashSet<Image>();
 
-	@Transient
-	private LocationDetails locationDetails;
+
+	//TODO
+	//@ManyToOne //eager by default
+	//@JoinColumn(name="location_id", referencedColumnName="id")
+	//private Location location;
+	
+	@ManyToOne //eager by default
+    @JoinColumn(name="country_code", referencedColumnName="iso_2")
+	private Country country;
 	
 	public Place(){
 	}
@@ -143,9 +161,9 @@ public class Place {
 	}
 
 	public Set<String> getPlaceTypes() {
-		return this.placeTypes;
-	}	
-	
+		return placeTypes;
+	}
+
 	public void setPlaceTypes(Set<String> placeTypes) {
 		this.placeTypes = placeTypes;
 	}
@@ -207,6 +225,14 @@ public class Place {
 	public void setStatus(int status) {
 		this.status = status;
 	}
+	
+	public int getCategory() {
+		return category;
+	}
+
+	public void setCategory(int category) {
+		this.category = category;
+	}
 
 	public Date getCreated() {
 		return created;
@@ -224,26 +250,21 @@ public class Place {
 		this.updated = updated;
 	}
 
-	public Integer getLocation() {
-		return location;
+	public Country getCountry(){
+		return country;
 	}
 
-	public String getZone(){
-		if (locationDetails != null)
-			return locationDetails.getZoneCode();
-		else return null;
+	public void setCountry(Country country){
+		this.country = country;
 	}
 
-	public String getCountry(){
-		if (locationDetails != null)
-			return locationDetails.getCountryCode();
-		else return null;
-	}
+//	public Location getLocation() {
+//	return location;
+//}
 	
-	
-	public void setLocation(Integer location) {
-		this.location = location;
-	}	
+//	public void setLocation(Location location) {
+//		this.location = location;
+//	}	
 
 	public User getCreatedBy() {
 		return createdBy;
@@ -260,13 +281,11 @@ public class Place {
 	public void setUpdatedBy(User updatedBy) {
 		this.updatedBy = updatedBy;
 	}
-
-	public LocationDetails getLocationDetails() {
-		return locationDetails;
-	}
-
-	public void setLocationDetails(LocationDetails locationDetails) {
-		this.locationDetails = locationDetails;
+	
+	public String getRegionCode(){
+		if (country != null)
+			return country.getSubRegionCode();
+		else return null;
 	}
 	
 	@Override

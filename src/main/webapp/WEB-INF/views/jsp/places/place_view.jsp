@@ -42,9 +42,9 @@
 					<spring:url value="/places/list" var="baseUrl" />
 				
 					<span class="glyphicon glyphicon-globe"></span>
-					<a href="${baseUrl}?zn=${place.locationDetails.zoneCode}">${place.locationDetails.zoneName}</a> / 
-					<a href="${baseUrl}?ccode=${place.locationDetails.countryCode}">${place.locationDetails.countryName}</a> / 
-					<a href="${baseUrl}?locid=${place.locationDetails.locationId}">${place.locationDetails.locationName}</a> 	
+					<a href="${baseUrl}?rgn=${place.country.codeIso2Char}">${place.country.regionName}</a> / 
+					<a href="${baseUrl}?subrgn=${place.country.codeIso2Char}">${place.country.subRegionName}</a> / 
+					<a href="${baseUrl}?iso2=${place.country.codeIso2Char}">${place.country.name}</a> 
 				</h5>
 				<h5>
 					<span class="label label-default"><c:out

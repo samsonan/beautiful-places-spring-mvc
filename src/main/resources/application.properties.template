@@ -1,0 +1,27 @@
+jdbc.driverClassName = org.postgresql.Driver
+jdbc.url = jdbc:postgresql://localhost:5432/bplaces
+jdbc.username = postgres
+jdbc.password = postgres
+
+hibernate.dialect = org.hibernate.dialect.PostgreSQLDialect
+hibernate.show_sql = true
+hibernate.format_sql = true
+
+hibernate.cache.use_second_level_cache=true
+hibernate.cache.use_query_cache=true
+hibernate.generate_statistics=true
+org.hibernate.cache.ehcache.configurationResourceName=/ehcache.xml
+hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+
+mail.host = smtp.gmail.com
+mail.port = 587
+mail.username = 
+mail.password = 
+		
+mail.transport.protocol = smtp
+mail.smtp.auth = true
+mail.smtp.starttls.enable = true 
+mail.debug = true
+
+image.path=C:/bplaces/images/
+

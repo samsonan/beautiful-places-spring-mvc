@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "image")
 public class Image implements Serializable {
@@ -53,10 +55,12 @@ public class Image implements Serializable {
     //Notes: http://stackoverflow.com/questions/3677380/proper-hibernate-annotation-for-byte
     @Basic(fetch = FetchType.LAZY)
     @Column(name="content", nullable=false)
+    @JsonIgnore
     private byte[] content;
  
     @ManyToOne(optional = false)
     @JoinColumn(name = "PLACE_ID")
+    @JsonIgnore
     private Place place;
     
     public Image() {}

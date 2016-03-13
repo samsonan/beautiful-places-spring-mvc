@@ -21,6 +21,9 @@ public class User {
 	public final static String ROLE_USER = "ROLE_USER";
 	public final static String ROLE_ADMIN = "ROLE_ADMIN";
 	
+	public final static int STATUS_PENDING = 0; 
+	public final static int STATUS_ACTIVE = 1; 
+	
 	public final static String [] ROLE_LIST = {ROLE_USER, ROLE_ADMIN};
 	
 	@Id

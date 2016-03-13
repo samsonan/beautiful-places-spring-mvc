@@ -38,11 +38,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/resources/**")
-                        .addResourceLocations("/resources/");
-		
-		registry.addResourceHandler("/images/**")
-						.addResourceLocations("file:C:/bplaces/images/");
+		registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+
+		registry.addResourceHandler("/images/**").addResourceLocations("file:C:/bplaces/images/");
+
+		registry.addResourceHandler("/img/**").addResourceLocations("/resources/img/");
+			//.setCachePeriod(100500);
 	}
 	
 	@Bean

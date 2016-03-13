@@ -56,7 +56,7 @@
 					
 					</td>
 					<td><a href="<c:url value='/places/add-image-${place.id}' />">${place.imageCount} (click to manage)</a></td>
-					<td>${place.country}</td>
+					<td>${place.country.regionName} / ${place.country.subregionName} / ${place.country.name}</td>
 					<td>
 						<a href="<spring:url value="/map/?lat=${place.lat}&lon=${place.lon}"/>">
 							<c:out value="${place.lat}" /> ; <c:out value="${place.lon}" />

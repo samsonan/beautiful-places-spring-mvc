@@ -48,22 +48,32 @@
 						<div class="form-group bg-success">
 							<label class="control-label col-sm-2" for="type">Type (nature):</label>
 							<div class="col-sm-5 bg-success">
-									<div class="checkbox"><label><form:checkbox path="placeTypes" value="BEACH"/>Beach</label></div>
-									<div class="checkbox"><label><form:checkbox path="placeTypes" value="LAKE"/>Lake</label></div>
-									<div class="checkbox"><label><form:checkbox path="placeTypes" value="MOUNT"/>Mountain</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="FLORA_FAUNA"/>Flora / Fauna</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="DESERT"/>Desert / Dunes</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="FOREST"/>Forest / Jungle</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="RIVER_LAKE"/>River / Lake</label></div>
 							</div>
 							<div class="col-sm-5">
-									<div class="checkbox"><label><form:checkbox path="placeTypes" value="RIVER"/>River</label></div>
-									<div class="checkbox"><label><form:checkbox path="placeTypes" value="VOLC"/>Volcano</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="COAST"/>Marine / Coastal</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="VOLC"/>Volcaninc / Thermal</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="FOREST"/>Mountain</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="CAVE"/>Karst / Caves</label></div>
 							</div>
+
+							<div class="checkbox"><label><form:checkbox path="placeTypes" value="NAT"/>Other</label></div>
 							
 						</div>
 						<div class="form-group bg-warning">
 							<label class="control-label col-sm-2" for="type">Type (culture):</label>
 							<div class="col-sm-5">
-									<div class="checkbox"><label><form:checkbox path="placeTypes" value="TEMPLE"/>Temple</label></div>
-									<div class="checkbox"><label><form:checkbox path="placeTypes" value="VILLAGE"/>Village</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="RELIG"/>Religious structure</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="URBAN"/>Urban Landscape</label></div>
 							</div>
+							<div class="col-sm-5">
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="ARCH"/>Archaeological site</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="CULT_LND"/>Cultural Landscape</label></div>
+							</div>
+							<div class="checkbox"><label><form:checkbox path="placeTypes" value="CULT"/>Other</label></div>
 						</div> 
 						
 						<div class="form-group">
@@ -85,12 +95,16 @@
 						<div class="form-group">
 							<label class="control-label col-sm-2" for="location">Location:</label>
 							<div class="col-sm-10">
-								<form:select class="form-control" id="zone" items="${zones}" path="zone" style="margin-bottom:5px;">
+								<form:select class="form-control" id="region" items="${regions}" path="regionCode" style="margin-bottom:5px;">
 								</form:select>
 								<form:select class="form-control" id="country" items="${countries}" path="country" style="margin-bottom:5px;">
 								</form:select>
+								
+								<% /*
 								<form:select class="form-control" id="location" items="${locations}" path="location">
 								</form:select>
+								*/ %>
+								
 							</div>
 						</div>
 						<div class="form-group">
@@ -186,26 +200,27 @@
 		<script>
 		
 		<c:if test="${empty place.title}">
-			$("#zone").prepend("<option value='0' selected='selected'>Select region</option>");
+			$("#region").prepend("<option value='0' selected='selected'>Select region</option>");
 		</c:if>
 		
-		//requestDDValues(null, "zone");
-		
-		$('#zone').change(
+	
+		$('#region').change(
 			    function() {
-			        var sel_zone = $('#zone option:selected').val();
+			        var sel_region = $('#region option:selected').val();
 			        $("#location").find('option').remove();   
-			        requestDDValues(sel_zone, "country");
+			        requestDDValues(sel_region, "country");
 			    }
 			);
 
+		/*
+		TODO: regions inside the country
 		$('#country').change(
 			    function() {
 			        var sel_country = $('#country option:selected').val();
 			        requestDDValues(sel_country, "location");
 			    }
 			);
-		
+		*/
 		
 		function requestDDValues(key, request_table) {
 
@@ -251,7 +266,7 @@
 		
 		function display(data){
 			
-			if (data.tableName == "zone" || data.tableName == "country" || data.tableName == "location") {
+			if (data.tableName == "region" || data.tableName == "country" || data.tableName == "location") {
 				var $select = $("#"+data.tableName);
 				$select.find('option').remove();
 				$select.append($("<option />").val("0").text("Select "+data.tableName));  

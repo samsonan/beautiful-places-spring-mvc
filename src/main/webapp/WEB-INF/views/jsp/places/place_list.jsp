@@ -16,12 +16,15 @@
 		<div class="row content">
 			<div class="col-sm-2 sidenav">
 
-				<jsp:include page="../fragments/filters.jsp" >
+				<jsp:include page="../fragments/filters-post.jsp" >
 					<jsp:param name="is_search" value="true" />
 					<jsp:param name="is_location" value="true" />
+					<jsp:param name="submit_via_ajax" value="false" />
 				</jsp:include>
 
 			</div>
+
+			<br/>
 
 			<div class="col-sm-9">
 				<h4>
@@ -42,9 +45,9 @@
 					</h2>
 					<h5>
 						<span class="glyphicon glyphicon-globe"></span>
-						<a href="${baseUrl}?zn=${place.locationDetails.zoneCode}">${place.locationDetails.zoneName}</a> / 
-						<a href="${baseUrl}?ccode=${place.locationDetails.countryCode}">${place.locationDetails.countryName}</a> / 
-						<a href="${baseUrl}?locid=${place.locationDetails.locationId}">${place.locationDetails.locationName}</a> 
+						<a href="${baseUrl}?rgn_base=${place.country.regionName}">${place.country.regionName}</a> / 
+						<a href="${baseUrl}?rgn=${place.country.subRegionCode}">${place.country.subRegionName}</a> / 
+						<a href="${baseUrl}?countries=${place.country.codeIso2Char}&rgn=${place.country.subRegionCode}">${place.country.name}</a>  	
 					</h5>
 					<h5>
 						<c:if test="${place.unesco}" >

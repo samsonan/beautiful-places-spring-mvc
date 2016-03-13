@@ -9,7 +9,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import com.samsonan.bplaces.dao.PlaceDao;
 import com.samsonan.bplaces.dao.UserDao;
+import com.samsonan.bplaces.model.Country;
 import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.model.PlaceFilters;
 import com.samsonan.bplaces.model.User;
@@ -58,7 +63,6 @@ public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements Pl
 		//Query query = getSession().createQuery("from Place p inner join p.placeTypes pt where pt in ('VILLAGE') ");
 		
 		Criteria criteria = createEntityCriteria();
-		
 
 		if (filters != null) {
 			criteria.createAlias("placeTypes", "pt");
@@ -67,8 +71,21 @@ public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements Pl
 			if (resList.length==0) resList = new String [] {""};//at least one element should be in the array
 			criteria.add(Restrictions.in("pt.elements", resList));
 			
+			if (filters.getCountries() != null && filters.getCountries().length > 0)
+				criteria.add(Restrictions.in("country.codeIso2Char", filters.getCountries()));
+			else if (filters.getRegion() != null) {
+				DetachedCriteria regionCountriesSubquery = DetachedCriteria.forClass(Country.class, "c");
+						// Filter the Subquery
+						Criterion cr1 = Restrictions.eq("subRegionCode", filters.getRegion());//SEA/NE/WAF/etc
+						Criterion cr2 = Restrictions.eq("regionName", filters.getRegion()); //not a mistake, can also be Africa/Europe/etc
+						regionCountriesSubquery.add(Restrictions.or(cr1,cr2))
+					    // SELECT The country code  
+					    .setProjection( Projections.property("c.codeIso2Char") );
+				criteria.add( Subqueries.propertyIn("country", regionCountriesSubquery) );
+			}
+			
 			if (filters.isUnesco())
-				criteria.add(Restrictions.eq("isUnesco", "true"));
+				criteria.add(Restrictions.eq("isUnesco", true));
 		}
 		
         return new HashSet<>(criteria.list());
@@ -108,5 +125,10 @@ public class PlaceDaoImpl extends AbstractDao<Serializable, Place> implements Pl
 		
         return new HashSet<>(query.list());
     }
+	
+	public Country getCountryByIso2(String code){
+		 return (Country) getSession().get(Country.class, code);
+		
+	}
 
 } 

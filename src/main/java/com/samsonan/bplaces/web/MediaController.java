@@ -72,7 +72,7 @@ public class MediaController {
         List<Image> images =  imageService.findAllByPlaceId(placeId);
         model.addAttribute("images", images);
          
-        return "manage_images";
+        return "places/manage_images";
     }
 
     /**
@@ -150,7 +150,7 @@ public class MediaController {
             List<Image> image = imageService.findAllByPlaceId(placeId);
             model.addAttribute("image", image);
              
-            return "manage_images";
+            return "places/manage_images";
         } else {
              
             Place place = placeService.findById(placeId);

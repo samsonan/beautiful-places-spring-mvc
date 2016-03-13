@@ -1,46 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <form:form id="filter-form" method="POST" modelAttribute="filters" role="form">
-
-	<c:if test="${param.is_search and false}">
-		<div class="input-group">
-			<input type="text" class="form-control" placeholder="Search...">
-			<span class="input-group-btn">
-				<button class="btn btn-default" type="button">
-					<span class="glyphicon glyphicon-search"></span>
-				</button>
-			</span>
-		</div>
-		<hr />
-	</c:if>
-
-	<c:if test="${param.is_location}">
-
-		<div>
-			<b>Location:</b>
-		</div>
-		<div class="dropdown">
-			<button class="btn btn-default dropdown-toggle" type="button"
-				data-toggle="dropdown">
-				Country and Region <span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu">
-				<li class="dropdown-header">South America</li>
-				<li><a href="#">Equador</a></li>
-				<li><a href="#">Peru</a></li>
-				<li class="divider"></li>
-				<li class="dropdown-header">Asia</li>
-				<li><a href="#">China</a></li>
-				<li><a href="#">Indonesia</a></li>
-				<li><a href="#">Thailand</a></li>
-			</ul>
-		</div>
-
-		<hr>
-
-	</c:if>
 
 	<div class="checkbox">
 		<label><input type="checkbox" name="unesco" id="unesco" value="UNESCO"/>Show UNESCO
@@ -67,15 +29,20 @@
 				
 							<div class="checkbox">
 								<label><input type="checkbox" name="naturalTypes[]"
-										class="checkNature" value="BEACH" />Beach</label>
+										class="checkNature" value="FLORA_FAUNA" />Flora / Fauna</label>
 							</div>
 							<div class="checkbox">
 								<label><input type="checkbox" name="naturalTypes[]"
-										class="checkNature" value="LAKE" />Lake</label>
+										class="checkNature" value="DESERT" />Desert</label>
 							</div>
 							<div class="checkbox">
 								<label><input type="checkbox" name="naturalTypes[]"
-										class="checkNature" value="CAVE" />Cave</label>
+										class="checkNature" value="FOREST" />Forest / Jungle</label>
+							</div>
+
+							<div class="checkbox">
+								<label><input type="checkbox" name="naturalTypes[]"
+										class="checkNature" value="RIVER_LAKE" />River / Lake</label>
 							</div>
 							
 						</div>
@@ -83,21 +50,25 @@
 						
 							<div class="checkbox">
 								<label><input type="checkbox" name="naturalTypes[]"
-										class="checkNature" value="RIVER" />River</label>
+										class="checkNature" value="COAST" />Marine / Coastal</label>
 							</div>
 							<div class="checkbox">
 								<label><input type="checkbox" name="naturalTypes[]"
-										class="checkNature" value="VOLC" />Volcano</label>
+										class="checkNature" value="VOLC" />Volcaninc / Thermal</label>
 							</div>
 							<div class="checkbox">
 								<label><input type="checkbox" name="naturalTypes[]"
 										class="checkNature" value="MOUNT" />Mountain</label>
 							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" name="naturalTypes[]"
+										class="checkNature" value="CAVE" />Karst / Caves</label>
+							</div>
 						</div>
 					</div>
 					<div class="checkbox">
 						<label><input type="checkbox" name="naturalTypes[]"
-								class="checkNature" value="OTHER" />Other</label>
+								class="checkNature" value="NAT" />Other</label>
 					</div>
 					
 				</div>
@@ -118,26 +89,33 @@
 			        <div class="row">
 			            <div class="col-md-6">
 				            <div class="checkbox">
-							<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
-								value="TEMPLE"/>Temple</label>
+								<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
+									value="RELIG"/>Religious structure</label>
+							</div>
+				            <div class="checkbox">
+								<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
+									value="URBAN"/>Urban Landscape</label>
 							</div>
 			            </div>
 			            <div class="col-md-6">
 							<div class="checkbox">
 								<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
-									value="VILLAGE"/>Village</label>
-							</div>			            
+									value="ARCH"/>Archaeological site</label>
+							</div>
+				            <div class="checkbox">
+								<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
+									value="CULT_LND"/>Cultural landscape</label>
+							</div>
+										            
 						</div>
 			        </div>
 		            <div class="checkbox">
 						<label><input type="checkbox" name="culturalTypes[]" class="checkCulture"
-							value="OTHER"/>Other</label>
+							value="CULT"/>Other</label>
 					</div>
 				</div>
 		</div>
 	</div>
-
-
 
 	<div class="btn-group" style="margin-top: 20px">
 		<button type="submit" id="btn-filter-apply" class="btn btn-primary"  name="filter.apply">Apply</button>
@@ -149,25 +127,27 @@
 
 
 <script>
+
 	jQuery(document).ready(function($) {
 
 		$(".checkNature").prop('checked', true);
 		$(".checkCulture").prop('checked', true);
-		
-		$("#filter-form").submit(function(event) {
 
+		$("#filter-form").submit(function(event) {
+	
 			// Disble the filter button
 			enableFilterButton(false);
-	
+		
 			// Prevent the form from submitting via the browser.
 			event.preventDefault();
-
+	
 			filterAjax();
-
+	
 		});
+			
 
 	});
-	
+
 	function filterAjax() {
 
 		var filter = {}
@@ -227,7 +207,7 @@
 	});
 
 </script>
-	
+
 <script>
 
 $(function() {
@@ -242,3 +222,6 @@ $(function() {
 	
 });
 </script>
+
+
+

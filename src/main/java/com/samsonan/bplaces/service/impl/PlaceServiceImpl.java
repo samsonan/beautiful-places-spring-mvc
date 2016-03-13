@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.samsonan.bplaces.dao.PlaceDao;
+import com.samsonan.bplaces.model.Country;
 import com.samsonan.bplaces.model.Place;
 import com.samsonan.bplaces.model.PlaceFilters;
 import com.samsonan.bplaces.service.PlaceService;
@@ -50,5 +51,9 @@ public class PlaceServiceImpl implements PlaceService {
 	public Set<Place> findAllMyPlaces() {
 		return dao.findAllMyPlaces();
 	}
+	
+	public Country getCountryByIso2(String code) {
+    	return dao.getCountryByIso2(code);
+    }
 	
 }

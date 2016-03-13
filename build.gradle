@@ -31,8 +31,11 @@ dependencies {
 	compile 'org.springframework.security:spring-security-taglibs:4.0.3.RELEASE'
 
 	compile 'org.hibernate:hibernate-core:4.3.6.Final'
-	compile 'org.hibernate:hibernate-validator:4.3.2.Final'
+	compile 'org.hibernate:hibernate-validator:4.3.6.Final'
 
+	compile 'org.hibernate:hibernate-ehcache:4.3.6.Final'
+	compile 'net.sf.ehcache:ehcache:2.10.1'
+	
 	compile 'org.postgresql:postgresql:9.4-1205-jdbc42'
 
 	compile 'com.fasterxml.jackson.core:jackson-core:2.7.2'

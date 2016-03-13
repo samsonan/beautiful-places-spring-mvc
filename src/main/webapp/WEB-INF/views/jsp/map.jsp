@@ -31,6 +31,7 @@
 				<jsp:include page="fragments/filters-ajax.jsp" >
 					<jsp:param name="is_search" value="false" />
 					<jsp:param name="is_location" value="false" />
+					<jsp:param name="submit_via_ajax" value="true" />
 				</jsp:include>
             </div>
 
@@ -47,11 +48,15 @@
 			<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
 		</div>
 
+	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+	
 	<script>
 
 		var markers = new Array();
+		
 		var map;
-
+		var markerCluster;
+		
 		function initialize() {
 			var mapOptions = {
 
@@ -70,7 +75,8 @@
 					document.getElementById("map-canvas"), mapOptions);
 
 			filterAjax();
-			
+
+			markerCluster = new MarkerClusterer(map, markers);
 		}
 
 		function bindInfoWindow(marker, map, infowindow, html) { 
@@ -86,6 +92,8 @@
 		
 	<script>
 
+	<spring:url value="/" var="baseUrl" />
+	
 	function requestPlaceInfoAjax(placeId) {
 		
 		console.log("requesting info for place id="+placeId);
@@ -122,6 +130,7 @@
 	function displayMarkers(data) {
 		
 		removeMarkers();
+		markerCluster.clearMarkers();
 		
 		markers = new Array();
 		
@@ -131,17 +140,26 @@
 		        position: myLatlng,
 		        map: map,
 		        title: data[i].title,
-		        id: data[i].id
+		        id: data[i].id,
+		        icon: getMarkerImg(data[i].category)
 		    });
 
-		    marker.addListener('click', function() {
-		    	requestPlaceInfoAjax(marker.id);
+		    google.maps.event.addListener(marker,'click', function() {
+		    	requestPlaceInfoAjax(this.id);
 				sidebar.open('info', null);
 			});				
 
 		    var infowindow = new google.maps.InfoWindow();
 
-			var content = "<b>" + data[i].title + "</b><br/><p>"+data[i].placeTypes.toString().toLowerCase()+"</p>";
+			var content = "<b>" + data[i].title + "</b><br/><p>";
+
+			if (data[i].unesco)
+        		content += "UNESCO <br/>";
+        	
+        	for (type of data[i].placeTypes) {         		
+        		content +=  convertType(type)+"; ";
+        	}
+        	content += "</p>"
 			
 			 google.maps.event.addListener(marker, 'mouseover', (function (marker, content, infowindow) {
 		            return function () {
@@ -157,7 +175,20 @@
 			
 		    
 		    markers.push(marker);
-		}		
+		}
+		
+		markerCluster.addMarkers(markers , true);
+	}
+	
+	function getMarkerImg(category) {
+		if (category == 1)
+			return '<c:url value="/img/marker_yellow.png" />';
+		else if (category == 2)
+			return '<c:url value="/img/marker_green.png" />';
+		else if (category == 3)
+			return '<c:url value="/img/marker_orange.png" />';
+		else
+			return '<c:url value="/img/marker_white.png" />'
 	}
 	
 	function removeMarkers() {
@@ -167,15 +198,36 @@
 	    }
 	}	
 	
+	function convertType (type) {
+		if (type == 'NAT')
+			return 'Natural sites';
+		else if (type == 'CULT')
+			return 'Cultural sites';
+		else 
+			return type;
+	}
+	
 	function displayPlaceInfo(data) {
 
 		<spring:url value="/places/view-place-" var="viewUrl" />
-		
+				
 		var content = "<h3><a href='${viewUrl}"+data.id+"'>"+data.title+"</a></h3>"+
         	"<hr/>"+
-        	"<p><span class='label label-default'>"+data.placeTypes+"</span></p>"+
-        	"<img src='http://griyasari.com/wp-content/uploads/2013/10/borobudur44.jpg' width='330' class='img-thumbnail' />"+
-        	"<br/><br/>"+
+        	"<p>";
+        	
+        	if (data.unesco)
+        		content += "<span class='label label-danger'>UNESCO</span> ";
+        	
+        	for (type of data.placeTypes) {         		
+        		content +=  "<span class='label label-default'>"+convertType(type)+"</span></p>";
+        	}
+        	
+        	if (data.placeImages.length == 0)
+        		content += "<b>No images avaialble</b>";
+        	else //TODO: iterate imgs onclick
+        		content += "<img src='${baseUrl}"+data.placeImages[0].imageSrc+"' width='330' class='img-thumbnail' />";
+        	
+        	content += "<br/><br/>"+
         	"<p>"+data.description+"</p>"+
         	"<a href='${viewUrl}"+data.id+"' class='btn btn-default'>More!...</a>";
 		

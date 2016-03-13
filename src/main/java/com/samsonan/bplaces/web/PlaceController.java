@@ -27,8 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.samsonan.bplaces.dao.LocationDao;
-import com.samsonan.bplaces.model.LocationDetails;
+import com.samsonan.bplaces.dao.LocationUtilsDao;
+import com.samsonan.bplaces.form.CountryPropertyEditor;
+import com.samsonan.bplaces.model.Country;
 import com.samsonan.bplaces.model.LocationRequest;
 import com.samsonan.bplaces.model.LocationResponse;
 import com.samsonan.bplaces.model.Place;
@@ -46,7 +47,7 @@ public class PlaceController {
 	PlaceService placeService;
 
 	@Autowired
-	LocationDao locationDao; //TODO: use service?
+	LocationUtilsDao locationDao;
 
 	@Autowired
 	PlaceFormValidator placeFormValidator;
@@ -54,6 +55,7 @@ public class PlaceController {
 	@InitBinder("place")
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(placeFormValidator);
+		binder.registerCustomEditor(Country.class, new CountryPropertyEditor(placeService));
 	}		
 	
 	@RequestMapping(value = {"/", "/map"}, method = RequestMethod.GET)
@@ -99,20 +101,76 @@ public class PlaceController {
 		return model;
 	}
 
+	// example: /places/?rgn=SEA&countries=ID,LA&types=VOLC,URBAN&unesco=1&nature=1&culture=1
 	@RequestMapping(value = {"/places","/places/list"}, method = RequestMethod.GET)
-	public String listPlaces(Model model) {
+	public String listPlaces(Model model,
+			@RequestParam(value = "base_rgn", required = false) String baseRegionParam, //Africa, Europa
+			@RequestParam(value = "rgn", required = false) String regionParam, //SEA,NA
+			@RequestParam(value = "countries", required = false) String countriesParam, //ID,LA,RU
+			@RequestParam(value = "unesco", required = false) String unescoParam,//1
+			@RequestParam(value = "nature", required = false) String natureParam,//1
+			@RequestParam(value = "culture", required = false) String cultureParam,//1
+			@RequestParam(value = "types", required = false) String typesParam) {//URBAN,VOLC,CULT
+		
+		logger.debug("listPlaces. params: region:{}, countries:{}, types:{}", regionParam, countriesParam, typesParam);
 		
 		Set<Place> set = placeService.findAll();
 		
-		for (Iterator<Place> iterator = set.iterator(); iterator.hasNext();) {
-			Place place = (Place) iterator.next();
-			place.setLocationDetails(locationDao.getLocationDetails(place.getLocation()));
-			
+		PlaceFilters filters = new PlaceFilters();
+		
+		//TODO:builder pattern
+		if (baseRegionParam != null && !baseRegionParam.isEmpty()) { // it is either baseRegionParam or regionParam, never both!
+			filters.setRegion(baseRegionParam);
 		}
 		
-		model.addAttribute("filters", new PlaceFilters());
+		if (regionParam != null && !regionParam.isEmpty()) {
+			filters.setRegion(regionParam);
+		}
+		
+		if (filters.getRegion() != null) {
+	        Map<String, String> countries = locationDao.findAllCountriesForRegion(filters.getRegion());
+			model.addAttribute("countries", countries);        
+		}
+
+		if (countriesParam != null && !countriesParam.isEmpty()) {
+			
+			try{
+				String [] countryCodes = countriesParam.split(",");
+				//filters.setCountries(locationDao.getCountryNamesByCodes(countryCodes));
+				filters.setCountries(countryCodes);
+			}catch (Exception e){
+				logger.error("error parsing country params:"+countriesParam, e);
+			}
+		}
+		
+		if (typesParam != null && !typesParam.isEmpty()) {
+			try{
+				String [] typeCodes = typesParam.split(",");
+				filters.setNaturalTypes(typeCodes);
+				filters.setCulturalTypes(typeCodes);
+			}catch (Exception e){
+				logger.error("error parsing types params:"+typesParam, e);
+			}
+		}
+
+		if (unescoParam != null && unescoParam.equals("1")) {
+			filters.setUnesco(true);
+		}
+
+		if (natureParam != null && natureParam.equals("1")) {
+			filters.setNature(true);
+		}
+		
+		if (cultureParam != null && cultureParam.equals("1")) {
+			filters.setCulture(true);
+		}
+				
+		model.addAttribute("filters", filters );
 		model.addAttribute("placeList", set);
 		
+        Map<String, String> regions = locationDao.findAllRegions();
+		model.addAttribute("regions", regions);        
+				
 		return "places/place_list";
 	}
 
@@ -122,6 +180,16 @@ public class PlaceController {
 		
 		Set<Place> set = placeService.findAll(filters);
 		model.addAttribute("placeList", set);
+	
+		Map<String, String> regions = locationDao.findAllRegions();
+		model.addAttribute("regions", regions);   
+		
+		if (filters.getRegion()!=null) {
+			Map<String, String> countries = locationDao.findAllCountriesForRegion(filters.getRegion());
+			model.addAttribute("countries", countries);
+		}
+		
+		model.addAttribute("filters", filters);
 		
 		return "places/place_list";
 	}
@@ -133,8 +201,8 @@ public class PlaceController {
     	Place place = new Place();
         model.addAttribute("place", place);
         
-        Map<String, String> zones = locationDao.findAllZones();
-		model.addAttribute("zones", zones);        
+        Map<String, String> regions = locationDao.findAllRegions();
+		model.addAttribute("regions", regions);        
         
         return "places/place_edit";
     }	
@@ -144,22 +212,21 @@ public class PlaceController {
     	
     	Place place = placeService.findById(id);
 
-    	LocationDetails details = locationDao.getLocationDetails(place.getLocation());
-
-        Map<String, String> zones = locationDao.findAllZones();
-		model.addAttribute("zones", zones);        
+        Map<String, String> regions = locationDao.findAllRegions(); // to fill DD list
+		model.addAttribute("regions", regions);        
     	
-    	if (details != null) {
+    	if (place.getCountry() != null) {
     	
-			place.setLocationDetails(details);
-	        
-	        Map<String, String> countries = locationDao.findAllCountriesForZone(details.getZoneCode());
+	        Map<String, String> countries = locationDao.findAllCountriesForRegion(place.getCountry().getSubRegionCode());
 			model.addAttribute("countries", countries);        
-	
-	        Map<String, String> locations = locationDao.findAllLocationsForCountry(details.getCountryCode());
-			model.addAttribute("locations", locations);
-
     	} 
+    	
+//		TODO
+//    	if (place.getLocation() != null) {
+//
+//	        Map<String, String> locations = locationDao.findAllLocationsForCountry(place.getCountry().getCodeIso2Char());
+//			model.addAttribute("locations", locations);
+//    	}
     	
 		model.addAttribute("place", place);
 
@@ -169,7 +236,6 @@ public class PlaceController {
     @RequestMapping(value = { "/places/view-place-{id}" }, method = RequestMethod.GET)
     public String viewPlace(@PathVariable int id, ModelMap model) {
         Place place = placeService.findById(id);
-        place.setLocationDetails(locationDao.getLocationDetails(place.getLocation()));
         model.addAttribute("place", place);
         return "places/place_view";
     }    
@@ -258,9 +324,9 @@ public class PlaceController {
 		locationResponse.setTableName(locationRequest.getReqTableName());
 		
 		if (locationRequest.getReqTableName().equals("zone"))
-			locationResponse.setLocationMap(locationDao.findAllZones());
+			locationResponse.setLocationMap(locationDao.findAllRegions());
 		else if (locationRequest.getReqTableName().equals("country"))
-			locationResponse.setLocationMap(locationDao.findAllCountriesForZone(locationRequest.getKey()));
+			locationResponse.setLocationMap(locationDao.findAllCountriesForRegion(locationRequest.getKey()));
 		else if (locationRequest.getReqTableName().equals("location"))
 			locationResponse.setLocationMap(locationDao.findAllLocationsForCountry(locationRequest.getKey()));
 		
