@@ -1,0 +1,13 @@
+Hello!
+
+Someone requested the password reset for Beautifult Places ($hostname) for the user: 
+
+$user_name
+
+If this was a mistake, please ignore this message and nothing will happen.
+
+To reset your password, click on this link: $hostname/$confirm_reset?uuid=$uuid
+
+Thank you.
+
+Please don't reply to this message. To contact the BPlaces support team, you can use our feedback form at $hostname/feedback.

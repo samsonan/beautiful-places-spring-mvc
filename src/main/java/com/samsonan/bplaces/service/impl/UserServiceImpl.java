@@ -24,38 +24,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     UserDao userDao;
 
 	@Autowired
-	MailService mailService;
+	MessageServiceImpl mailService;
     
     @Override
     public User registerNewUser(User user) {
         userDao.saveOrUpdate(user);
                 
-        //generate unique confirmation ID to your application
-        //String uuid = java.util.UUID.randomUUID().toString();
-        //store the ID with the account;
-        
-        //Send the URL+ID (http://yourapp.com/confirm?id=UUID) as an email
-        //request mapping GET /confirm?id=UUID
-        //redirect somewhere
-        
-    	sendRegistrationEmail(user.getEmail());
+        mailService.sendRegistrationMessage(user);
         return user;
     }
     
-    private void sendRegistrationEmail(String email) {
-    	mailService.sendMail("samsonan.info@gmail.com", email, "bplaces registration", "hello");
-    }
+    
     
     public void restoreUserPassword(User user) {
     	
-    	//TODO:
-    	//generate UUID with exp date
-        //store the ID with the account;
-        //Send the URL+ID (http://yourapp.com/reset?id=UUID) as an email
-        //request mapping GET /reset?id=UUID
-    	//redirect to login
-    	
-    	mailService.sendMail("samsonan.info@gmail.com", user.getEmail(), "restore password", "restore");
+    	mailService.sendPasswordResetMessage(user);
     }
     
 	public List<User> findAll(){

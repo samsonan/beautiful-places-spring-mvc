@@ -1,12 +1,17 @@
 # beautiful-places-spring-mvc 
 
 Ongoing project based on:
-- Spring MVC 4 (including security)
-- Hibernate
+- Spring MVC 4 (+security)
+- Hibernate (although with some direct JDBC)
 - PostgreSQL
 - Gradle as build tool
 
-UI is simply JSP/jstl with a bunch of JavaScript/jQuery
+Additinal features include:
+ - Velicity Engine/Template
+ - Ehcache for ref data
+ - Email sendlist
+
+UI is simply JSP/jstl with a bunch of JavaScript/jQuery. And some ajax, obviously.
 
 And Bootstrap 3 for CSS
 

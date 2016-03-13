@@ -96,8 +96,7 @@
 
 
 				</sec:authorize>
-				<li><a href="">About</a></li>
-				<li><a href="">Feedback</a></li>
+				<li><a href="<c:url value='/feedback' />">About Us / Feedback</a></li>
 			</ul>
 		</div>
 		<!-- /.navbar-collapse -->

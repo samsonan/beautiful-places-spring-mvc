@@ -1,0 +1,11 @@
+Hello!
+
+This email address $email_to was added by user $user_name as his/her e-mail for receiving notifications from Beautifult Places ($hostname).
+
+If you did not provide this email address, please ignore this message.
+
+To confirm your address, click on this link: $hostname/$confirm_url?uuid=$uuid
+
+Thank you.
+
+Please don't reply to this message. To contact the BPlaces support team, you can use our feedback form at $hostname/feedback.

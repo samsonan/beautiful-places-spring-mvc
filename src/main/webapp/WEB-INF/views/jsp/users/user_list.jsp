@@ -52,11 +52,17 @@
 						<spring:url value="/users/${user.id}" var="userUrl" />
 						<spring:url value="/users/${user.id}/delete" var="deleteUrl" />
 						<spring:url value="/users/${user.id}/update" var="updateUrl" />
+						<spring:url value="/users/${user.id}/send_reg" var="regMsgUrl" />
+						<spring:url value="/users/${user.id}/send_reset" var="resMsgUrl" />
 	
 						<button class="btn btn-primary"
 							onclick="location.href='${updateUrl}'">Update</button>
 						<button class="btn btn-danger"
 							onclick="this.disabled=true;post('${deleteUrl}',{'${_csrf.parameterName}': '${_csrf.token}'})">Delete</button>
+						<button class="btn btn-default"
+							onclick="location.href='${regMsgUrl}'">Send Reg.Msg</button>
+						<button class="btn btn-default"
+							onclick="location.href='${resMsgUrl}'">Send Res.Msg</button>
 					</td>
 				</tr>
 			</c:forEach>

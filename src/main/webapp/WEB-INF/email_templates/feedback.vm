@@ -1,0 +1,16 @@
+Hi!
+
+Feedback message was sent from Beautifult Places ($hostname) by:
+
+form_email: $form_email
+form name: $form_name
+
+acc_user_email: $user_email
+acc_user_name: $user_name
+acc_user_id: $user_id
+
+Message:
+=====================
+$feedback_text
+=====================
+

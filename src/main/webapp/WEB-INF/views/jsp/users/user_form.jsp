@@ -33,7 +33,7 @@
 					<div class="col-sm-10">
 						<form:input path="name" type="text" class="form-control" id="name"
 							placeholder="Name" />
-						<form:errors path="name" class="control-label" />
+						<form:errors path="name" cssClass="text-danger" />
 					</div>
 				</div>
 			</spring:bind>
@@ -44,7 +44,7 @@
 					<div class="col-sm-10">
 						<form:input path="email" class="form-control" id="email"
 							placeholder="Email" />
-						<form:errors path="email" class="control-label" />
+						<form:errors path="email" cssClass="text-danger" />
 					</div>
 				</div>
 			</spring:bind>
@@ -55,7 +55,7 @@
 					<div class="col-sm-10">
 						<form:password path="password" class="form-control" id="password"
 							placeholder="password" />
-						<form:errors path="password" class="control-label" />
+						<form:errors path="password"  cssClass="text-danger" />
 					</div>
 				</div>
 			</spring:bind>
@@ -66,7 +66,7 @@
 					<div class="col-sm-10">
 						<form:password path="confirmPassword" class="form-control"
 							id="password" placeholder="password" />
-						<form:errors path="confirmPassword" class="control-label" />
+						<form:errors path="confirmPassword" cssClass="text-danger" />
 					</div>
 				</div>
 			</spring:bind>
@@ -77,7 +77,7 @@
 					<div class="col-sm-10">
 						<form:input path="firstName" class="form-control"
 							id="firstName" placeholder="firstName" />
-						<form:errors path="firstName" class="control-label" />
+						<form:errors path="firstName" cssClass="text-danger" />
 					</div>
 				</div>
 			</spring:bind>
@@ -88,7 +88,7 @@
 					<div class="col-sm-10">
 						<form:input path="lastName" class="form-control"
 							id="lastName" placeholder="lastName" />
-						<form:errors path="lastName" class="control-label" />
+						<form:errors path="lastName" cssClass="text-danger" />
 					</div>
 				</div>
 			</spring:bind>
@@ -100,7 +100,7 @@
 					<form:radiobuttons path="role" items="${roleList}" 
                                 element="label class='radio-inline'" />
 					<br />
-					<form:errors path="role" class="control-label" />
+					<form:errors path="role" cssClass="text-danger" />
 				</div>
 		  </div>
 			</spring:bind>
