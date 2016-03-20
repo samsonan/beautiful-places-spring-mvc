@@ -4,7 +4,7 @@ This email address $email_to was added by user $user_name as his/her e-mail for 
 
 If you did not provide this email address, please ignore this message.
 
-To confirm your address, click on this link: $hostname/$confirm_url?uuid=$uuid
+To confirm your address, click on this link: $hostname/$confirm_url?uuid=$uuid&user_id=$user_id
 
 Thank you.
 

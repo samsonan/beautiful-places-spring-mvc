@@ -33,8 +33,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/places/edit-*").access("hasAnyRole('USER','ADMIN')")
 		.antMatchers("/places/delete-*").access("hasAnyRole('USER','ADMIN')")
 		.antMatchers("/places/**").permitAll()
-		.antMatchers("/users/**").access("hasRole('ADMIN')")
 		.antMatchers("/users/me").access("hasAnyRole('USER','ADMIN')")
+		.antMatchers("/users/**").access("hasRole('ADMIN')")
 		.and()
 		    .formLogin().loginPage("/login")
 		    .failureUrl("/login?error") //default

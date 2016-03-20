@@ -53,7 +53,7 @@
 				<div class="form-group ${status.error ? 'has-error' : ''}">
 					<label class="col-sm-2 control-label">Password</label>
 					<div class="col-sm-10">
-						<form:password path="password" class="form-control" id="password"
+						<form:password path="password" class="form-control" id="password" showPassword="true"
 							placeholder="password" />
 						<form:errors path="password"  cssClass="text-danger" />
 					</div>
@@ -62,9 +62,9 @@
 
 			<spring:bind path="confirmPassword">
 				<div class="form-group ${status.error ? 'has-error' : ''}">
-					<label class="col-sm-2 control-label">confirm Password</label>
+					<label class="col-sm-2 control-label">Confirm Password</label>
 					<div class="col-sm-10">
-						<form:password path="confirmPassword" class="form-control"
+						<form:password path="confirmPassword" class="form-control" showPassword="true"
 							id="password" placeholder="password" />
 						<form:errors path="confirmPassword" cssClass="text-danger" />
 					</div>

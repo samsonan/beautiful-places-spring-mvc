@@ -3,6 +3,7 @@ package com.samsonan.bplaces.util.validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.samsonan.bplaces.model.User;
@@ -23,12 +24,21 @@ public class UserFormValidator implements Validator {
 	public void validate(Object target, Errors errors) {
 
 		User user = (User) target;
+
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "NotEmpty.user.name");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "NotEmpty.user.email");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "NotEmpty.user.password");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmPassword", "NotEmpty.user.password");
 		
-		if (userService.findByName(user.getName()) != null) {
+		User findUser = userService.findByName(user.getName());
+		
+		if (findUser != null && (user.getId() == null || !findUser.getId().equals(user.getId()))) {
 			errors.rejectValue("name", "Exists.user.name");
 		}
 
-		if (userService.findByEmail(user.getEmail()) != null) {
+		findUser = userService.findByName(user.getName());
+		
+		if (findUser != null && (user.getId() == null || !findUser.getId().equals(user.getId()))) {
 			errors.rejectValue("email", "Exists.user.email");
 		}
 		

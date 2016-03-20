@@ -34,8 +34,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return user;
     }
     
-    
-    
     public void restoreUserPassword(User user) {
     	
     	mailService.sendPasswordResetMessage(user);
@@ -96,6 +94,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
 		authorities.add(new SimpleGrantedAuthority(role));
 		return authorities;
+	}
+
+	@Override
+	public void setUserStatus(int id, int status) {
+		User user = findById(id);
+		user.setStatus(status);
+   		saveUser(user);
+	}
+
+	@Override
+	public void setUserPassword(int id, String password) {
+		User user = findById(id);
+		user.setPassword(password);
+		saveUser(user);
+		
 	}	
     
     

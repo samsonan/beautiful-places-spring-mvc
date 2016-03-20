@@ -6,7 +6,7 @@ $user_name
 
 If this was a mistake, please ignore this message and nothing will happen.
 
-To reset your password, click on this link: $hostname/$confirm_reset?uuid=$uuid
+To reset your password, click on this link: $hostname/$confirm_reset?uuid=$uuid&user_id=$user_id
 
 Thank you.
 

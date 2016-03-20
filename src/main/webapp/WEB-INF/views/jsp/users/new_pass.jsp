@@ -17,13 +17,17 @@
 					<div class="panel-title">Password Reset</div>
 				</div>
 				<div class="panel-body">
-					<form:form id="signupform" modelAttribute="user" class="form-horizontal" role="form">
-
-						<div id="signupalert" style="display: none"
-							class="alert alert-danger">
-							<p>Error:</p>
-							<span></span>
+				
+					<c:if test="${not empty msg}">
+						<div class="alert alert-${css} alert-dismissible" role="alert">
+							<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+							${msg}
 						</div>
+					</c:if>
+									
+					<form:form id="passResetForm" modelAttribute="passResetForm" class="form-horizontal" role="form">
+
+						<form:hidden path="id" />
 
 						<div class="form-group">
 							<label for="password" class="col-md-3 control-label">Password</label>

@@ -14,15 +14,27 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import com.samsonan.bplaces.util.validation.ValidEmail;
 
+/**
+ * Site user entity.
+ * 
+ * Validated by com.samsonan.bplaces.util.validation.UserFormValidator
+ * @author Andrey Samsonov (samsonan)
+ *
+ */
 @Entity
 @Table(name="bplace_user")
 public class User { 
 	
+	/**
+	 * User may have one role at a time
+	 */
 	public final static String ROLE_USER = "ROLE_USER";
 	public final static String ROLE_ADMIN = "ROLE_ADMIN";
 	
-	public final static int STATUS_PENDING = 0; 
-	public final static int STATUS_ACTIVE = 1; 
+	//email is not confirmed
+	public final static int STATUS_PENDING = 0;
+	//email is confirmed. USers created by admin are active by default
+	public final static int STATUS_ACTIVE = 1;  
 	
 	public final static String [] ROLE_LIST = {ROLE_USER, ROLE_ADMIN};
 	
@@ -31,7 +43,10 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;  
 	
-    @NotEmpty(message = "{NotEmpty.user.name}")
+	/**
+	 * login and display name
+	 */
+    @NotEmpty
 	@Column(name="name")
     private String name;
 
@@ -46,16 +61,25 @@ public class User {
 	@Column(name="last_name")
     private String lastName; 
 
-    @NotEmpty(message = "{NotEmpty.user.password}")
+    @NotEmpty
 	@Column(name="password")
     private String password;
 
     @Transient
     private String confirmPassword;
     
+    /**
+     * user role. See ROLE_* constants
+     */
 	@Column(name="role")
     private String role;
-   
+
+	/**
+	 * user status. See STAUS_* constants
+	 */
+	@Column(name="status")
+    private int status;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -113,7 +137,7 @@ public class User {
 	}
 
 	public boolean isNew() {
-		return (id == 0);
+		return (id == null);
 	}
 
 	public String getConfirmPassword() {
@@ -124,6 +148,14 @@ public class User {
 		this.confirmPassword = confirmPassword;
 	}
 	
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
 	@Override
     public int hashCode() {
 		return new HashCodeBuilder(17, 37).

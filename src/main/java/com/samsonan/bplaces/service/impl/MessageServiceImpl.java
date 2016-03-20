@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.scheduling.annotation.Async;
@@ -69,6 +70,7 @@ public class MessageServiceImpl
         	
         	Map<String, Object> model = new HashMap<>();	             
         	model.put("email_to",user.getEmail());
+        	model.put("user_id",user.getId());
         	model.put("hostname",hostname);
         	model.put("user_name",user.getName());
         	model.put("confirm_url","spring4/confirm_reg");//TODO: config
@@ -101,7 +103,7 @@ public class MessageServiceImpl
         final long logId = key.longValue();
         
     	try{
-    		//sendMail(fromEmail, user.getEmail(), REGISTER_SUBJECT, content);
+//    		sendMail(fromEmail, user.getEmail(), SUBJECT_REGISTER, content);
     	}catch (Exception ex){
 			logger.error("Error sending message",ex);
 			logError(logId, ex.getMessage(), jdbcTemplate);
@@ -114,12 +116,12 @@ public class MessageServiceImpl
         //redirect somewhere
     }    
 	
-	public boolean checkRegistrationUUID(User user, String uuid){
+	public boolean checkRegistrationUUID(int user_id, String uuid){
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		String sql = "SELECT UUID FROM MESSAGE_LOG WHERE TYPE = ? and UUID = ? and USER_ID = ?";
 		 
 		String res = (String) jdbcTemplate.queryForObject(
-				sql, new Object[] { TYPE_REGISTER, uuid, user.getId() }, String.class);
+				sql, new Object[] { TYPE_REGISTER, uuid, user_id }, String.class);
 		
 		return res!=null && res.equals(uuid);
 	}
@@ -140,6 +142,7 @@ public class MessageServiceImpl
         	
         	Map<String, Object> model = new HashMap<>();	             
         	model.put("email_to",user.getEmail());
+        	model.put("user_id",user.getId());
         	model.put("hostname",hostname);
         	model.put("user_name",user.getName());
         	model.put("confirm_reset","spring4/confirm_reset");//TODO: config
@@ -171,7 +174,7 @@ public class MessageServiceImpl
         final long logId = key.longValue();
         
     	try{
-    		//sendMail(fromEmail, user.getEmail(), PASS_RESET_SUBJECT, content);
+//    		sendMail(fromEmail, user.getEmail(), SUBJECT_PASS_RESET, content);
     	}catch (Exception ex){
 			logger.error("Error sending message",ex);
 			logError(logId, ex.getMessage(), jdbcTemplate);
@@ -184,13 +187,13 @@ public class MessageServiceImpl
     	//redirect to login
     }  	
 
-	public boolean checkPasswordResetUUID(User user, String uuid){
+	public boolean checkPasswordResetUUID(int user_id, String uuid){
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		String sql = "SELECT UUID FROM MESSAGE_LOG WHERE TYPE = ? and UUID = ? and USER_ID = ?";
 		 
 		//TODO: check expiration
 		String res = (String) jdbcTemplate.queryForObject(
-				sql, new Object[] { TYPE_PASS_RESET, uuid, user.getId() }, String.class);
+				sql, new Object[] { TYPE_PASS_RESET, uuid, user_id }, String.class);
 		
 		return res!=null && res.equals(uuid);
 	}    
@@ -218,7 +221,7 @@ public class MessageServiceImpl
 	        	model.put("user_id", "N/A");
         	}
         	
-        	model.put("message",form.getMessage());
+        	model.put("feedback_text",form.getMessage());
             
             content = VelocityEngineUtils.mergeTemplateIntoString(
             		velocityEngine, TEMPLATE_FEEDBACK, "UTF-8", model);
@@ -250,7 +253,7 @@ public class MessageServiceImpl
         final long logId = key.longValue();
         
     	try{
-    		//sendMail(fromEmail, user.getEmail(), PASS_RESET_SUBJECT, content);
+    		//sendMail(siteEmail, siteEmail, SUBJECT_FEEDBACK, content);
     	}catch (Exception ex){
 			logger.error("Error sending message",ex);
 			logError(logId, ex.getMessage(), jdbcTemplate);
@@ -272,7 +275,7 @@ public class MessageServiceImpl
 		this.mailSender = mailSender;
 	}
 	
-	public void sendMail(String from, String to, String subject, String msg) throws Exception {
+	public void sendMail(String from, String to, String subject, String msg) throws MailException {
 
 		logger.debug("Sending message to={0} with subject={1}", to, subject);
 

@@ -2,6 +2,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="sec"	uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,13 +11,13 @@
 
 <body>
 
-	<div class="container" style="margin-top: 50px;">
+	<div class="container" style="margin-top: 70px;">
 
 		<c:if test="${not empty msg}">
 			<div class="alert alert-${css} alert-dismissible" role="alert">
 				<button type="button" class="close" data-dismiss="alert"
 					aria-label="Close">
-					<span aria-hidden="true">×</span>
+					<span aria-hidden="true">&times;</span>
 				</button>
 				<strong>${msg}</strong>
 			</div>
@@ -55,21 +56,27 @@
 						<spring:url value="/users/${user.id}/send_reg" var="regMsgUrl" />
 						<spring:url value="/users/${user.id}/send_reset" var="resMsgUrl" />
 	
-						<button class="btn btn-primary"
-							onclick="location.href='${updateUrl}'">Update</button>
-						<button class="btn btn-danger"
-							onclick="this.disabled=true;post('${deleteUrl}',{'${_csrf.parameterName}': '${_csrf.token}'})">Delete</button>
-						<button class="btn btn-default"
-							onclick="location.href='${regMsgUrl}'">Send Reg.Msg</button>
-						<button class="btn btn-default"
-							onclick="location.href='${resMsgUrl}'">Send Res.Msg</button>
+						<sec:authentication property="principal" var ="principal" />
+	
+						<c:if test="${user.name ne principal.username}"> 
+	
+							<button class="btn btn-primary"
+								onclick="location.href='${updateUrl}'">Update</button>
+							<button class="btn btn-danger"
+								onclick="this.disabled=true;post('${deleteUrl}',{'${_csrf.parameterName}': '${_csrf.token}'})">Delete</button>
+							<button class="btn btn-default"
+								onclick="location.href='${regMsgUrl}'">Send Reg Msg</button>
+							<button class="btn btn-default"
+								onclick="location.href='${resMsgUrl}'">Send Pass Rst Msg</button>
+							
+						</c:if>
+						
 					</td>
 				</tr>
 			</c:forEach>
 		</table>
 
 	</div>
-
 
 	<jsp:include page="../fragments/footer.jsp" />
 

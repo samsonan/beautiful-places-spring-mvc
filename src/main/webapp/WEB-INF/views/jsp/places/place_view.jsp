@@ -7,7 +7,7 @@
 
 <jsp:include page="../fragments/header.jsp" />
 
-	<div class="container-fluid" style="margin-top: 50px;">
+	<div class="container-fluid" style="margin-top: 70px;">
 		<div class="row content">
 			<div class="col-sm-1 sidenav">
 

@@ -18,7 +18,9 @@ public interface UserService {
      
     void deleteById(int id);
     
-    public void restoreUserPassword(User user);
+    void restoreUserPassword(User user);
     
+    void setUserStatus(int id, int status);
+    void setUserPassword(int id, String password);
 	
 }
