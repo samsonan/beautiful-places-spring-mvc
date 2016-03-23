@@ -8,6 +8,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import com.samsonan.bplaces.dao.UserDao;
+import com.samsonan.bplaces.exception.UserNotFoundException;
 import com.samsonan.bplaces.model.User;
 
 @Repository("userDao")
@@ -35,8 +36,12 @@ public class UserDaoImpl extends AbstractDao<Serializable, User> implements User
 	}
 
 	@Override
-	public void deleteById(int id) {
+	public void deleteById(int id) throws UserNotFoundException {
 		User user = getByKey(id);
+
+		if (user == null)
+			throw new UserNotFoundException();
+
 		delete(user);
 	}
 

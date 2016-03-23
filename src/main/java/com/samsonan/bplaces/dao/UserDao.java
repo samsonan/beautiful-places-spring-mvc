@@ -2,6 +2,7 @@ package com.samsonan.bplaces.dao;
 
 import java.util.List;
 
+import com.samsonan.bplaces.exception.UserNotFoundException;
 import com.samsonan.bplaces.model.User;
 
 public interface UserDao {
@@ -14,7 +15,7 @@ public interface UserDao {
      
     void saveOrUpdate(User user);
      
-    void deleteById(int id);	
+    void deleteById(int id) throws UserNotFoundException;	
 
     
 }

@@ -19,12 +19,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({ "com.samsonan.bplaces.config" })
-@PropertySource(value = { "classpath:application.properties" })
+@PropertySource(value = { "classpath:application-${spring.profile.active}.properties" })
 public class HibernateConfig {
 
     @Autowired
     private Environment environment;
-    
+
 	@Bean
 	public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();

@@ -9,7 +9,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 
 @Configuration
-@ComponentScan({ "com.samsonan.bplaces" })
+@ComponentScan(basePackages = { "com.samsonan.bplaces" } /*, 
+		excludeFilters = {@ComponentScan.Filter(type=FilterType.REGEX, pattern="com.samsonan.bplaces.test.*")}*/)
 @EnableAsync
 public class AppConfig {
 

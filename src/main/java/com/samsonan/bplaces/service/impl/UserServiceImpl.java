@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.samsonan.bplaces.dao.UserDao;
+import com.samsonan.bplaces.exception.UserNotFoundException;
 import com.samsonan.bplaces.model.User;
 import com.samsonan.bplaces.service.UserService;
 
@@ -64,7 +65,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public void deleteById(int id) {
+	public void deleteById(int id) throws UserNotFoundException {
 		userDao.deleteById(id);
 	}
   

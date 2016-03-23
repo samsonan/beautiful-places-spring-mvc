@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.samsonan.bplaces.exception.UserNotFoundException;
 import com.samsonan.bplaces.model.FeedbackForm;
 import com.samsonan.bplaces.model.PassResetForm;
 import com.samsonan.bplaces.model.User;
@@ -74,7 +76,10 @@ public class UserController {
 		binder.setValidator(userFormValidator);
 	}	
 
-	
+	@ExceptionHandler(UserNotFoundException.class)
+    public String handleResourceNotFoundException() {
+        return "error/404";
+    }	
 	/**
 	 * Redirecting to custom login page
 	 * @return
@@ -398,7 +403,7 @@ public class UserController {
 		List<User> list = userService.findAll();
 		model.addAttribute("userList", list);
 
-		return "/users/user_list";
+		return "users/user_list";
 	}
 	
 	/**
@@ -416,11 +421,15 @@ public class UserController {
 
 	/**
 	 * Updating user by admin. Form request
+	 * @throws UserNotFoundException user with requested id not found 
 	 */
 	@RequestMapping(value = "/users/{id}/update", method = RequestMethod.GET)
-	public String showUpdateUserForm(@PathVariable("id") int id, Model model) {
+	public String showUpdateUserForm(@PathVariable("id") int id, Model model) throws UserNotFoundException {
 
 		User user = userService.findById(id);
+		if (user == null)
+			throw new UserNotFoundException();
+		
 		//need to fill both fields with same value. so it is not required to update password if it not necessary.
 		//otherwise confirm pass field will be blank and both password fields have to be filled again! 
 		user.setConfirmPassword(user.getPassword());
@@ -462,10 +471,10 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/users/{id}/delete", method = RequestMethod.POST)
 	public String deleteUser(@PathVariable("id") int id, 
-		final RedirectAttributes redirectAttributes) {
+		final RedirectAttributes redirectAttributes) throws UserNotFoundException {
 
 		logger.debug("deleteUser() : {}", id);
-
+		
 		userService.deleteById(id);
 		
 		redirectAttributes.addFlashAttribute("css", "success");
@@ -477,13 +486,17 @@ public class UserController {
 
 	/**
 	 * Resend registration email (requested by admin to selected user).
+	 * @throws UserNotFoundException 
 	 */
 	@RequestMapping(value = "/users/{id}/send_reg", method = RequestMethod.GET)
 	public String sendUserConfirmEmail(@PathVariable("id") int id, 
-			final RedirectAttributes redirectAttributes) {
+			final RedirectAttributes redirectAttributes) throws UserNotFoundException {
 
 		User user = userService.findById(id);
 	
+		if (user == null)
+			throw new UserNotFoundException();
+		
 		messageService.sendRegistrationMessage(user);
 		
 		redirectAttributes.addFlashAttribute("css", "success");
@@ -494,13 +507,17 @@ public class UserController {
 
 	/**
 	 * Send password reset email (requested by admin to selected user).
+	 * @throws UserNotFoundException 
 	 */
 	@RequestMapping(value = "/users/{id}/send_reset", method = RequestMethod.GET)
 	public String sendPasswordResetEmail(@PathVariable("id") int id, 
-			final RedirectAttributes redirectAttributes) {
+			final RedirectAttributes redirectAttributes) throws UserNotFoundException {
 
 		User user = userService.findById(id);
 	
+		if (user == null)
+			throw new UserNotFoundException();
+
 		messageService.sendPasswordResetMessage(user);
 		
 		redirectAttributes.addFlashAttribute("css", "success");

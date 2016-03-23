@@ -2,9 +2,10 @@ package com.samsonan.bplaces.service;
 
 import java.util.List;
 
+import com.samsonan.bplaces.exception.UserNotFoundException;
 import com.samsonan.bplaces.model.User;
 
-public interface UserService {
+public interface UserService  {
 
 	User registerNewUser(User user);
 
@@ -16,7 +17,7 @@ public interface UserService {
 	
     void saveUser(User user);
      
-    void deleteById(int id);
+    void deleteById(int id) throws UserNotFoundException;
     
     void restoreUserPassword(User user);
     
