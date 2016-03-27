@@ -4,7 +4,7 @@
 
 CREATE TABLE public.image
 (
-  id integer NOT NULL DEFAULT nextval('photo_id_seq'::regclass),
+  id serial NOT NULL,
   place_id integer,
   title text,
   description text,

@@ -4,7 +4,7 @@
 
 CREATE TABLE public.place_link
 (
-  id integer NOT NULL DEFAULT nextval('links_id_seq'::regclass),
+  id serial NOT NULL,
   site_name text,
   url text,
   place_id integer,

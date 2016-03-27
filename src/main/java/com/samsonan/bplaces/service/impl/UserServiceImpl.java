@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.samsonan.bplaces.dao.UserDao;
 import com.samsonan.bplaces.exception.UserNotFoundException;
 import com.samsonan.bplaces.model.User;
+import com.samsonan.bplaces.service.UserMessageService;
 import com.samsonan.bplaces.service.UserService;
 
 @Service("userService")
@@ -24,20 +25,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     UserDao userDao;
 
-	@Autowired
-	MessageServiceImpl mailService;
+	@Autowired(required=true)
+	UserMessageService userMessageService;
     
     @Override
     public User registerNewUser(User user) {
         userDao.saveOrUpdate(user);
                 
-        mailService.sendRegistrationMessage(user);
+        userMessageService.sendRegistrationMessage(user);
         return user;
     }
     
     public void restoreUserPassword(User user) {
     	
-    	mailService.sendPasswordResetMessage(user);
+    	userMessageService.sendPasswordResetMessage(user);
     }
     
 	public List<User> findAll(){

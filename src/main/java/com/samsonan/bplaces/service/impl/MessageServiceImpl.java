@@ -22,27 +22,22 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import com.samsonan.bplaces.model.FeedbackForm;
 import com.samsonan.bplaces.model.User;
+import com.samsonan.bplaces.service.UserMessageService;
 
-@Service("mailService")
-public class MessageServiceImpl
+@Service("userMessageService")
+public class MessageServiceImpl implements UserMessageService
 {
-	public static final String TYPE_REGISTER = "REGISTER";
-	public static final String TYPE_PASS_RESET = "PASS_RESET";
-	public static final String TYPE_FEEDBACK = "FEEDBACK";
-	
-	public static final int STATUS_PENDING = 0;
-	public static final int STATUS_SUCCESS = 1;
-	public static final int STATUS_ERROR = -1;
-	
-	//TODO: config
-	public static final String SUBJECT_REGISTER = "Beautiful Places Registration. Confirm your e-mail";
-	public static final String SUBJECT_PASS_RESET = "Beautiful Places Password Reset";
-	public static final String SUBJECT_FEEDBACK = "Beautiful Places User Feedback";
 
 	//TODO: config
-	public static final String TEMPLATE_REGISTER = "register.vm";
-	public static final String TEMPLATE_PASS_RESET = "reset_pass.vm";
-	public static final String TEMPLATE_FEEDBACK = "feedback.vm";
+	private final static String SUBJECT_REGISTER = "Beautiful Places Registration. Confirm your e-mail";
+	private final static String SUBJECT_PASS_RESET = "Beautiful Places Password Reset";
+	private final static String SUBJECT_FEEDBACK = "Beautiful Places User Feedback";
+	
+	//TODO: config
+	private final static String TEMPLATE_REGISTER = "register.vm";
+	private final static String TEMPLATE_PASS_RESET = "reset_pass.vm";
+	private final static String TEMPLATE_FEEDBACK = "feedback.vm";
+	
 	
 	private final Logger logger = LoggerFactory.getLogger(MessageServiceImpl.class);	
 	
@@ -55,9 +50,15 @@ public class MessageServiceImpl
     @Autowired
     private VelocityEngine velocityEngine;    
     
+	/* (non-Javadoc)
+	 * @see com.samsonan.bplaces.service.impl.UserMessageService#sendRegistrationMessage(com.samsonan.bplaces.model.User)
+	 */
+	@Override
 	@Async
     public void sendRegistrationMessage(User user) {
     	
+		logger.debug("Prepare to Send Registration email for user {}", user);
+		
         //generate unique confirmation ID to your application
         String uuid = java.util.UUID.randomUUID().toString();
 
@@ -101,6 +102,8 @@ public class MessageServiceImpl
         
         Number key = insert.executeAndReturnKey(parameters);
         final long logId = key.longValue();
+
+        logger.debug("insert message executed. id: {}", logId);
         
     	try{
 //    		sendMail(fromEmail, user.getEmail(), SUBJECT_REGISTER, content);
@@ -116,6 +119,10 @@ public class MessageServiceImpl
         //redirect somewhere
     }    
 	
+	/* (non-Javadoc)
+	 * @see com.samsonan.bplaces.service.impl.UserMessageService#checkRegistrationUUID(int, java.lang.String)
+	 */
+	@Override
 	public boolean checkRegistrationUUID(int user_id, String uuid){
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		String sql = "SELECT UUID FROM MESSAGE_LOG WHERE TYPE = ? and UUID = ? and USER_ID = ?";
@@ -126,6 +133,10 @@ public class MessageServiceImpl
 		return res!=null && res.equals(uuid);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.samsonan.bplaces.service.impl.UserMessageService#sendPasswordResetMessage(com.samsonan.bplaces.model.User)
+	 */
+	@Override
 	@Async
     public void sendPasswordResetMessage(User user) {
     	
@@ -187,6 +198,10 @@ public class MessageServiceImpl
     	//redirect to login
     }  	
 
+	/* (non-Javadoc)
+	 * @see com.samsonan.bplaces.service.impl.UserMessageService#checkPasswordResetUUID(int, java.lang.String)
+	 */
+	@Override
 	public boolean checkPasswordResetUUID(int user_id, String uuid){
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		String sql = "SELECT UUID FROM MESSAGE_LOG WHERE TYPE = ? and UUID = ? and USER_ID = ?";
@@ -198,6 +213,10 @@ public class MessageServiceImpl
 		return res!=null && res.equals(uuid);
 	}    
     
+	/* (non-Javadoc)
+	 * @see com.samsonan.bplaces.service.impl.UserMessageService#sendFeedback(com.samsonan.bplaces.model.User, com.samsonan.bplaces.model.FeedbackForm)
+	 */
+	@Override
 	@Async
     public void sendFeedback(User user, FeedbackForm form) {
     	
@@ -271,10 +290,18 @@ public class MessageServiceImpl
 		jdbcTemplate.update("update MESSAGE_LOG set status = ?, status_timestamp=? where id = ?", STATUS_SUCCESS, new Date(), logId);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.samsonan.bplaces.service.impl.UserMessageService#setMailSender(org.springframework.mail.MailSender)
+	 */
+	@Override
 	public void setMailSender(MailSender mailSender) {
 		this.mailSender = mailSender;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.samsonan.bplaces.service.impl.UserMessageService#sendMail(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
 	public void sendMail(String from, String to, String subject, String msg) throws MailException {
 
 		logger.debug("Sending message to={0} with subject={1}", to, subject);

@@ -45,6 +45,7 @@ public class Place {
 	public final static int STATUS_PENDING = 0; 
 	public final static int STATUS_READY = 1; 
 	public final static int STATUS_PUBLISHED = 2; 
+	public final static int STATUS_APPROVED = 2; 
 
 	public final static int CATEGORY_CULTURE = 1; //01
 	public final static int CATEGORY_NATURE = 2;  //10

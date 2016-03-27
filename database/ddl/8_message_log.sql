@@ -4,7 +4,7 @@
 
 CREATE TABLE public.message_log
 (
-  id integer NOT NULL DEFAULT nextval('message_log_id_seq'::regclass),
+  id serial NOT NULL,
   type text,
   user_id integer,
   subject text,

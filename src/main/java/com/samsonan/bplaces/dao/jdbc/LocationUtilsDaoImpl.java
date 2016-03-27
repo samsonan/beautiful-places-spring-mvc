@@ -73,7 +73,6 @@ public class LocationUtilsDaoImpl implements LocationUtilsDao {
 				" order by region asc, subregion asc ";
 
 		List <Map<String, Object>> results = jdbcTemplate.queryForList(SQL); 
-		regions.put("", " - Filter by Region - ");
 
 		for (Map<String, Object> m : results){
 			regions.put(m.get("code").toString(), m.get("region") +" / "+ m.get("subregion"));

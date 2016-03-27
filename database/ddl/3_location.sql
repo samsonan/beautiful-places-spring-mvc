@@ -4,7 +4,7 @@
 
 CREATE TABLE public.location
 (
-  id integer NOT NULL DEFAULT nextval('regions_region_id_seq'::regclass),
+  id serial NOT NULL,
   name text,
   country_code text,
   CONSTRAINT "PK_regions" PRIMARY KEY (id),

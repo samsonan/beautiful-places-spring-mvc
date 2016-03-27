@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+	<bplace_user email="admin@email.com" name="admin" first_name="First" last_name="Last" password="p@ss" role="ROLE_ADMIN" status="1" />
+	<bplace_user email="user_active@email.com" name="user_active" first_name="Ivan" last_name="Ivanov" password="pass111" role="ROLE_USER" status="1" />
+	<bplace_user email="user_pending@email.com" name="user_pending" first_name="Sergey" last_name="Sergeev" password="pass222" role="ROLE_USER" status="0" />
+	<bplace_user email="new_user@email.com" name="new user name" first_name="new user first" last_name="new user last" password="P@ss111" role="ROLE_USER" status="1" />
+</dataset>

@@ -1,7 +1,6 @@
 package com.samsonan.bplaces.web;
 
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -28,8 +27,8 @@ import com.samsonan.bplaces.exception.UserNotFoundException;
 import com.samsonan.bplaces.model.FeedbackForm;
 import com.samsonan.bplaces.model.PassResetForm;
 import com.samsonan.bplaces.model.User;
+import com.samsonan.bplaces.service.UserMessageService;
 import com.samsonan.bplaces.service.UserService;
-import com.samsonan.bplaces.service.impl.MessageServiceImpl;
 import com.samsonan.bplaces.util.validation.PassResetFormValidator;
 import com.samsonan.bplaces.util.validation.UserFormValidator;
 
@@ -48,20 +47,39 @@ import com.samsonan.bplaces.util.validation.UserFormValidator;
  *
  */
 @Controller
-public class UserController {
-
+public class UserController extends BaseController {
+    
+    public static final String REQUEST_FEEDBACK = "/feedback";
+    public static final String REQUEST_MAP = "/map";
+    public static final String REQUEST_LOGIN = "/login"; 
+    public static final String REQUEST_MY_PROFILE = "/users/me";
+    public static final String REQUEST_USER_LIST = "/users/list";
+    public static final String REQUEST_USER_RESTORE = "/restore";
+    
+    public static final String VIEW_MAP = "/map";
+	public static final String VIEW_FEEDBACK = "/feedback";
+	public static final String VIEW_USER_LOGIN = "users/login";
+	public static final String VIEW_USER_REGISTER = "users/register";
+	public static final String VIEW_USER_RESTORE = "users/user_restore";
+    public static final String VIEW_USER_NEW_PASS = "users/new_pass";
+    public static final String VIEW_USER_EDIT = "users/user_edit";
+    public static final String VIEW_USER_LIST = "users/user_list";
+    public static final String VIEW_USER_PROFILE_VIEW = "users/profile_view";
+    public static final String VIEW_USER_PROFILE_EDIT = "users/profile_edit";
+	
+	
 	private final Logger logger = LoggerFactory.getLogger(UserController.class);	
 	
 	@Autowired
 	UserService userService;
 	
 	@Autowired
-	MessageServiceImpl messageService;
+	UserMessageService messageService;
 	
 	@Autowired
 	UserFormValidator userFormValidator;
-	
-	/**
+
+    /**
 	 * Used in the following cases:
 	 *  - profile edit
 	 *  - user create/update by admin
@@ -78,7 +96,7 @@ public class UserController {
 
 	@ExceptionHandler(UserNotFoundException.class)
     public String handleResourceNotFoundException() {
-        return "error/404";
+        return VIEW_404;
     }	
 	/**
 	 * Redirecting to custom login page
@@ -86,7 +104,7 @@ public class UserController {
 	 */
 	@RequestMapping(value = {"/login"}, method = RequestMethod.GET)
 	public String login() {
-		return "/users/login";
+		return VIEW_USER_LOGIN;
 	}
 
 	
@@ -101,7 +119,7 @@ public class UserController {
 	
         FeedbackForm form = new FeedbackForm();
         model.addAttribute("feedbackForm", form);
-		return "/feedback";
+		return VIEW_FEEDBACK;
 	}	
 
 	/**
@@ -114,7 +132,7 @@ public class UserController {
 			  BindingResult result, final RedirectAttributes redirectAttributes) {
 		
     	if (result.hasErrors()) {
-            return "/feedback";
+            return VIEW_FEEDBACK;
         }
 
 		User user = null;
@@ -129,10 +147,10 @@ public class UserController {
 		
 		messageService.sendFeedback(user, form);
 
-    	redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "Your feedback has been successfully sent!");
+    	redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("feedback.meesage.sent"));
 		
-    	return "redirect:/feedback";
+    	return createRedirectViewPath(REQUEST_FEEDBACK);
 	}
 	
 	/** ----------------------- Registration ----------------------- **/
@@ -145,7 +163,7 @@ public class UserController {
 	
         User user = new User();
         model.addAttribute("user", user);
-		return "/users/register";
+		return VIEW_USER_REGISTER;
 	}	
 
 	/**
@@ -156,7 +174,7 @@ public class UserController {
 			  BindingResult result, HttpServletRequest request, HttpServletResponse response) {
 		
     	if (result.hasErrors()) {
-            return "/users/register";
+            return VIEW_USER_REGISTER;
         }
  
     	userInfo.setRole(User.ROLE_USER);
@@ -167,10 +185,10 @@ public class UserController {
    	   		request.login(userInfo.getName(), userInfo.getPassword());
    		}catch (Exception ex) {
    			//automatic login failed? not a big deal
-   			logger.error("Automatic login after registration for user "+userInfo.getName()+" failed",ex);
+   			//logger.error("Automatic login after registration for user "+userInfo.getName()+" failed",ex);
    		}
  
-		return "redirect:/map";
+		return createRedirectViewPath(REQUEST_MAP);
 	}	
 	
 	/**
@@ -186,20 +204,20 @@ public class UserController {
 		try{
 			int id = Integer.valueOf(userId);
 			if (!messageService.checkRegistrationUUID(id, uuid)) {
-				throw new Exception("Registration details not found or expired!");
+				throw new Exception(getMessage("user.activate.reg.not_found"));
 			}
 
 			userService.setUserStatus(id, User.STATUS_ACTIVE);
 			
 		}catch(Exception ex){
-			redirectAttributes.addFlashAttribute("css", "danger");
-			redirectAttributes.addFlashAttribute("msg", "Error while activating the account:"+ex.getMessage()+". Please contact support.");
-			return "redirect:/login";
+			redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_ERROR);
+			redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.activate.error", ex.getMessage()));
+			return createRedirectViewPath(VIEW_USER_LOGIN);
 		}
-		redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "Your email is confirmed!");
+		redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.activate.ok"));
 		
-		return "redirect:/login";
+		return createRedirectViewPath(REQUEST_LOGIN);
 	}	
 
 	/** ----------------------- Password Reset ----------------------- **/
@@ -209,7 +227,7 @@ public class UserController {
 	 */
 	@RequestMapping(value = {"/restore"}, method = RequestMethod.GET)
 	public String restore() {
-		return "/users/user_restore";
+		return VIEW_USER_RESTORE;
 	}	
 
 	/**
@@ -229,29 +247,29 @@ public class UserController {
         if (!username.isEmpty()) {
         	user = userService.findByName(username);
         	if (user == null) {
-                redirectAttributes.addFlashAttribute("css", "danger");
-        		redirectAttributes.addFlashAttribute("msg", "User "+username+" not found!");
-        		return "redirect:/restore";
+                redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_ERROR);
+        		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.name.not_found", username));
+        		return createRedirectViewPath(REQUEST_USER_RESTORE);
         	}
         } else if (!email.isEmpty()) {
         	user = userService.findByEmail(email);
         	if (user == null) {
-                redirectAttributes.addFlashAttribute("css", "danger");
-        		redirectAttributes.addFlashAttribute("msg", "User with email "+email+" not found!");
-        		return "redirect:/restore";
+                redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_ERROR);
+        		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.email.not_found", email));
+        		return createRedirectViewPath(REQUEST_USER_RESTORE);
         	}
         } else {
-            redirectAttributes.addFlashAttribute("css", "danger");
-    		redirectAttributes.addFlashAttribute("msg", "Please specify either username or email");
-    		return "redirect:/restore";
+            redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_ERROR);
+    		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.name_email.empty"));
+    		return createRedirectViewPath(REQUEST_USER_RESTORE);
         }
         
         userService.restoreUserPassword(user);
         
-        redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "Message has been sent!");
+        redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("message.sent"));
 				
-        return "redirect:/restore";
+		return createRedirectViewPath(REQUEST_USER_RESTORE);
     }
 
     /**
@@ -267,20 +285,20 @@ public class UserController {
 		try{
 
 			if (!messageService.checkPasswordResetUUID(Integer.valueOf( userId ), uuid)) {
-				throw new Exception("Password reset details not found or expired!");
+				throw new Exception(getMessage("user.password.reset.not_found"));
 			}
 
 		}catch(Exception ex){
-			redirectAttributes.addFlashAttribute("css", "danger");
-			redirectAttributes.addFlashAttribute("msg", "Error while trying to reset the password:"+ex.getMessage()+". Please contact support.");
-			return "redirect:/login";
+			redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_ERROR);
+			redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.password.reset.error",ex.getMessage()));
+			return createRedirectViewPath(REQUEST_LOGIN);
 		}
 		
 		PassResetForm form = new PassResetForm();
 		form.setId(Integer.valueOf( userId ));
 		model.addAttribute("passResetForm", form);
 		
-		return "/users/new_pass";
+		return VIEW_USER_NEW_PASS;
 	}	
     
 	/**
@@ -294,15 +312,15 @@ public class UserController {
 		validator.validate(form, result);
 		
 		if (result.hasErrors()) {
-			return "/users/new_pass";
+			return VIEW_USER_NEW_PASS;
 		}
 
 		userService.setUserPassword(form.getId(),form.getPassword());
 
-		redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "Password updated successfully!");
+		redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.password.update.ok"));
 		
-		return "redirect:/login";
+		return createRedirectViewPath(REQUEST_LOGIN);
 	}  
 	/** ----------------------- User self profile ----------------------- **/
 	
@@ -322,7 +340,7 @@ public class UserController {
 		user.setConfirmPassword(user.getPassword());
 		
         model.addAttribute("user", user);
-		return "/users/user_profile_edit";
+        return VIEW_USER_PROFILE_EDIT;
 	}	
 	
 	/**
@@ -333,27 +351,27 @@ public class UserController {
 			  BindingResult result, final RedirectAttributes redirectAttributes) {
 		
 		if (result.hasErrors()) {
-            return "/users/user_profile_edit";
+            return VIEW_USER_PROFILE_EDIT;
         }
 
 		User currentUser = userService.findById(user.getId());
 
 		StringBuilder builder = new StringBuilder();
-		builder.append("User Profile updated successfully!\n");
+		builder.append(getMessage("user.profile.update.ok"));
 
 		//so user has changed his email
 		if (!currentUser.getEmail().equals(user.getEmail())){
-			builder.append("Activation email is sent to "+user.getEmail()+". Please check you mailbox and confirm it.");
+			builder.append(getMessage("user.registration.sent", user.getEmail()));
 			messageService.sendRegistrationMessage(user);
 		}
 		
     	// Add message to flash scope
-    	redirectAttributes.addFlashAttribute("css", "success");
-   		redirectAttributes.addFlashAttribute("msg", builder.toString());
+    	redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+   		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, builder.toString());
     	
    		userService.saveUser(user);
  
-		return "redirect:/users/me";
+		return createRedirectViewPath(REQUEST_MY_PROFILE);
 	}		
 	
 	/**
@@ -368,10 +386,10 @@ public class UserController {
 	
 		messageService.sendRegistrationMessage(user);
 		
-		redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "Registration email is sent to "+user.getEmail());
+		redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.registration.user.sent", user.getEmail()));
 		
-		return "redirect:/users/me";
+		return createRedirectViewPath(REQUEST_MY_PROFILE);
 	}	
 
 	/**
@@ -386,10 +404,10 @@ public class UserController {
 	
 		messageService.sendPasswordResetMessage(user);
 		
-		redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "Password Reset email is sent!");
+		redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.reset.sent"));
 		
-		return "redirect:/users/me";
+		return createRedirectViewPath(REQUEST_MY_PROFILE);
 	}	
 	
 	/** ------------------------------------- Admin forms and functions -------------------------------------- **/
@@ -403,7 +421,7 @@ public class UserController {
 		List<User> list = userService.findAll();
 		model.addAttribute("userList", list);
 
-		return "users/user_list";
+        return VIEW_USER_LIST;
 	}
 	
 	/**
@@ -416,7 +434,7 @@ public class UserController {
         user.setRole(User.ROLE_USER);
         model.addAttribute("userForm", user);
         
-		return "/users/user_edit";
+        return VIEW_USER_EDIT;
 	}	
 
 	/**
@@ -435,7 +453,7 @@ public class UserController {
 		user.setConfirmPassword(user.getPassword());
 		model.addAttribute("userForm", user);
 		
-		return "/users/user_edit";
+        return VIEW_USER_EDIT;
 	}	
 
 	
@@ -447,15 +465,15 @@ public class UserController {
 			  BindingResult result, final RedirectAttributes redirectAttributes) {
 		
     	if (result.hasErrors()) {
-            return "/users/user_edit";
+            return VIEW_USER_EDIT;
         }
     	
     	// Add message to flash scope
-    	redirectAttributes.addFlashAttribute("css", "success");
+    	redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
     	if(user.isNew()){
-    		redirectAttributes.addFlashAttribute("msg", "User added successfully!");
+    		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.add.ok"));
     	}else{
-    		redirectAttributes.addFlashAttribute("msg", "User updated successfully!");
+    		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.update.ok"));
     	}
     	
     	//as user is created by admin, he is already active!
@@ -463,7 +481,7 @@ public class UserController {
     				
    		userService.saveUser(user);
  
-		return "redirect:/users/list";
+		return createRedirectViewPath(REQUEST_USER_LIST);
 	}		
 	
 	/**
@@ -477,11 +495,10 @@ public class UserController {
 		
 		userService.deleteById(id);
 		
-		redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "User is deleted!");
+		redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.delete.ok"));
 		
-		return "redirect:/users/list";
-
+		return createRedirectViewPath(REQUEST_USER_LIST);
 	}	
 
 	/**
@@ -499,10 +516,10 @@ public class UserController {
 		
 		messageService.sendRegistrationMessage(user);
 		
-		redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "Registration email is sent!");
+		redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.registration.admin.sent", user.getEmail()));
 		
-		return "redirect:/users/list";
+		return createRedirectViewPath(REQUEST_USER_LIST);
 	}	
 
 	/**
@@ -520,10 +537,10 @@ public class UserController {
 
 		messageService.sendPasswordResetMessage(user);
 		
-		redirectAttributes.addFlashAttribute("css", "success");
-		redirectAttributes.addFlashAttribute("msg", "Password Reset email is sent!");
+		redirectAttributes.addFlashAttribute(FLASH_CSS_ATTR, FLASH_CSS_VALUE_OK);
+		redirectAttributes.addFlashAttribute(FLASH_MSG_ATTR, getMessage("user.reset.sent"));
 		
-		return "redirect:/users/list";
+		return createRedirectViewPath(REQUEST_USER_LIST);
 	}		
 	
 	/**
@@ -534,6 +551,7 @@ public class UserController {
 
         return User.ROLE_LIST;
     }	
+	
     
 }
 

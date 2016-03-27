@@ -52,6 +52,7 @@
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="DESERT"/>Desert / Dunes</label></div>
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="FOREST"/>Forest / Jungle</label></div>
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="RIVER_LAKE"/>River / Lake</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="NAT"/>Other</label></div>
 							</div>
 							<div class="col-sm-5">
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="COAST"/>Marine / Coastal</label></div>
@@ -59,8 +60,6 @@
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="FOREST"/>Mountain</label></div>
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="CAVE"/>Karst / Caves</label></div>
 							</div>
-
-							<div class="checkbox"><label><form:checkbox path="placeTypes" value="NAT"/>Other</label></div>
 							
 						</div>
 						<div class="form-group bg-warning">
@@ -68,12 +67,12 @@
 							<div class="col-sm-5">
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="RELIG"/>Religious structure</label></div>
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="URBAN"/>Urban Landscape</label></div>
+									<div class="checkbox"><label><form:checkbox path="placeTypes" value="CULT"/>Other</label></div>
 							</div>
 							<div class="col-sm-5">
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="ARCH"/>Archaeological site</label></div>
 									<div class="checkbox"><label><form:checkbox path="placeTypes" value="CULT_LND"/>Cultural Landscape</label></div>
 							</div>
-							<div class="checkbox"><label><form:checkbox path="placeTypes" value="CULT"/>Other</label></div>
 						</div> 
 						
 						<div class="form-group">
@@ -199,10 +198,7 @@
 
 		<script>
 		
-		<c:if test="${empty place.title}">
-			$("#region").prepend("<option value='0' selected='selected'>Select region</option>");
-		</c:if>
-		
+		$("#region").prepend("<option value='0' selected='selected'>Select region</option>");
 	
 		$('#region').change(
 			    function() {
@@ -284,9 +280,8 @@
 		
 			var table = document.getElementById('LinksTable'),
 				tbody = table.getElementsByTagName('tbody')[0];
-
-		
-			$("#isUnescoChk").checked?$('#unescoPanel').show():$('#unescoPanel').hide()
+	
+			$("#isUnescoChk").prop('checked')?$('#unescoPanel').show():$('#unescoPanel').hide()
 					
 			$("#isUnescoChk").change(function(){
 				if(this.checked)

@@ -159,6 +159,8 @@
 
 <script>
 
+	$("#region").prepend("<option value='0' selected='selected'> -- Filter by region -- </option>");
+
 	$('#region').change(
 	    function() {
 	        var sel_region = $('#region option:selected').val();

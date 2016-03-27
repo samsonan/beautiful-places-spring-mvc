@@ -63,7 +63,7 @@ public class PlaceFormValidator implements Validator {
 	    		if ((link.getSiteName().isEmpty() && !link.getUrl().isEmpty()) 
 	    				|| (!link.getSiteName().isEmpty() && link.getUrl().isEmpty()) ){
 	    			errors.rejectValue("placeLinks", "Consistent.place.placeLinks");
-	    		} else if (!link.getSiteName().isEmpty() && !link.getUrl().isEmpty()) {
+	    		} else if (!link.getSiteName().isEmpty() && !link.getUrl().isEmpty() && !isValidURI(link.getUrl())) {
 					errors.rejectValue("placeLinks", "URL.place.placeLinks", new String []{ link.getSiteName()},"");
 	    		}
 			}

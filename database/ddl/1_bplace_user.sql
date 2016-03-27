@@ -4,7 +4,7 @@
 
 CREATE TABLE public.bplace_user
 (
-  id integer NOT NULL DEFAULT nextval('user_id_seq'::regclass),
+  id serial NOT NULL,
   email text,
   name text,
   first_name text,

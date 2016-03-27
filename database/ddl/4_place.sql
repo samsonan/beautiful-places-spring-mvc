@@ -6,7 +6,7 @@ CREATE TABLE public.place
 (
   title text,
   description text,
-  id integer NOT NULL DEFAULT nextval('place_id_seq'::regclass),
+  id serial NOT NULL,
   created timestamp with time zone DEFAULT now(),
   updated timestamp with time zone,
   status integer NOT NULL,
